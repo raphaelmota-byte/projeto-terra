@@ -1,4 +1,5 @@
 import random
+import config.constantes as const 
 
 
 class Celula:
@@ -6,6 +7,7 @@ class Celula:
         self.x = pos_x
         self.y = pos_y
         self.tipo = tipo
+        self.entidades = []
         
     def __repr__(self) :
         if self.tipo == "terra":
@@ -25,7 +27,10 @@ class Mapa:
        return [ [Celula(x , y) for x in range(self.largura)] for y in range(self.comprimento) ]
    
     def gerar_agua(self):
-        pass
+        for linha in self.celulas:
+            for celula in linha:
+                if random.random() < const.CHANCE_AGUA:
+                   celula.tipo = "agua"
        
         
     def __str__(self):
@@ -33,8 +38,3 @@ class Mapa:
    
    
     
-
-mapa = Mapa(16 , 16 )
-print(mapa)
-for linhas in mapa.celulas:
-    print(*linhas)
