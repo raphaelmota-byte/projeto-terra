@@ -1,10 +1,11 @@
 from mundo.posicao import Posicao
+import config.constantes as const
 
 
 
 class Entidade:
     def __init__(self , posicao_obj:Posicao ):
-        self.posicao_coordenada:tuple[int , int] = posicao_obj.posicao
+        self.posicao_coordenada:tuple[int , int] = (posicao_obj.posicao_x , posicao_obj.posicao_y)
        
         
 
@@ -38,4 +39,24 @@ class Planta(SerVivo):
         self.crescer() #Roda crescer
         
     def __str__(self) -> str:
-        return f"{super().__str__()} - tamanho: {self.tamanho}"
+        return f"{super().__str__()} - tamanho: {self.tamanho}"     
+    
+class Animal(SerVivo):
+    def __init__(self, posicao_obj:Posicao , energia , percepcao):
+        super().__init__(posicao_obj)
+        self.energia = energia
+        self.energia = percepcao
+
+    def gastar_energia(self):
+        pass
+    
+    def alimentar(self):
+        pass
+
+    def reproduzir(self):
+        pass
+
+
+class Coelho(Animal):
+    def __init__(self , posicao_obj:Posicao  ,):
+        super().__init__(posicao_obj , const.ENERGIA_COELHO , const.PERCEPCAO_COELHO)

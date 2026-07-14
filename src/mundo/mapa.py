@@ -6,7 +6,7 @@ from mundo.posicao import Posicao
 class Celula:
     def __init__(self  , posicao:Posicao ,tipo="terra"):
         self.posicao_obj = posicao
-        self.posicao_coordenadas = posicao.posicao
+        self.posicao_coordenadas = (posicao.posicao_x , posicao.posicao_y)
         self.tipo = tipo
         self.entidades = []
         
@@ -37,6 +37,9 @@ class Mapa:
             for celula in linha:
                 if random.random() < const.CHANCE_AGUA:
                    celula.transformar_em_agua()
+
+    def adicionar_entidade(self , entidade):
+        pass
        
         
     def __str__(self):

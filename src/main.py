@@ -1,6 +1,7 @@
 from mundo.mapa import Mapa
 
 
+
 mapa = Mapa(16 , 16 )
 print(mapa)
 
@@ -14,7 +15,7 @@ print("--" * 60)
 for linhas in mapa.celulas:
     print(*linhas)
 
-from entidades.entidades import Posicao  , Planta
+from entidades.entidades import Posicao  , Planta , Coelho
 
 posicao_generica = Posicao(2, 1)
 
@@ -23,3 +24,6 @@ print(planta)
 
 planta.envelhecer()
 print(planta)
+
+coelho = Coelho(Posicao(1,1))
+print(coelho.posicao_coordenada)
