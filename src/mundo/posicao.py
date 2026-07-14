@@ -1,5 +1,7 @@
 
 class Posicao:
     def __init__(self , posicao_x:int , posicao_y:int) -> None:
-        self.posicao_x = posicao_x  
-        self.posicao_y = posicao_y
+        self.x = posicao_x  
+        self.y = posicao_y
+    def __str__(self):
+        return f"posição: ({self.x},{self.y})"

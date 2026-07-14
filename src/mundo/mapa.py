@@ -4,9 +4,8 @@ from mundo.posicao import Posicao
 
 
 class Celula:
-    def __init__(self  , posicao:Posicao ,tipo="terra"):
-        self.posicao_obj = posicao
-        self.posicao_coordenadas = (posicao.posicao_x , posicao.posicao_y)
+    def __init__(self  , posicao_obj:Posicao ,tipo="terra"):
+        self.posicao = posicao_obj
         self.tipo = tipo
         self.entidades = []
         
@@ -26,7 +25,7 @@ class Mapa:
     def __init__(self , largura:int , comprimento:int ) -> None :
         self.largura = largura
         self.comprimento = comprimento
-        self.celulas = self.gerar_celulas()
+        self.celulas = self.gerar_celulas() #essa eh a grid
         
         
     def gerar_celulas(self):
@@ -38,7 +37,8 @@ class Mapa:
                 if random.random() < const.CHANCE_AGUA:
                    celula.transformar_em_agua()
 
-    def adicionar_entidade(self , entidade):
+    def adicionar_entidade(self , entidade:object):
+        # x , y = entidade.posicao_obj. 
         pass
        
         

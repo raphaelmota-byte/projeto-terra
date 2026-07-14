@@ -5,13 +5,14 @@ import config.constantes as const
 
 class Entidade:
     def __init__(self , posicao_obj:Posicao ):
-        self.posicao_coordenada:tuple[int , int] = (posicao_obj.posicao_x , posicao_obj.posicao_y)
+        self.posicao = posicao_obj
+        
        
         
 
 class SerVivo(Entidade):
     def __init__(self , posicao_obj:Posicao):
-        super().__init__(posicao_obj )
+        super().__init__(posicao_obj)
         self.idade:int = 0
         self.vivo:bool = True
         
@@ -22,7 +23,11 @@ class SerVivo(Entidade):
         self.vivo = False
         
     def __str__(self) -> str:
-        return f"idade do ser {self.idade} - ele está vivo?: {self.vivo} - posição:{self.posicao_coordenada}"
+        return ( 
+            f"idade: {self.idade} "
+            f"vivo: {self.vivo} "
+            f"posição: {self.posicao}" 
+            )
     
     
 class Planta(SerVivo):
@@ -39,13 +44,16 @@ class Planta(SerVivo):
         self.crescer() #Roda crescer
         
     def __str__(self) -> str:
-        return f"{super().__str__()} - tamanho: {self.tamanho}"     
+        return (
+            f"{super().__str__()} " 
+            f"- tamanho: {self.tamanho}"     
+            )
     
 class Animal(SerVivo):
     def __init__(self, posicao_obj:Posicao , energia , percepcao):
         super().__init__(posicao_obj)
         self.energia = energia
-        self.energia = percepcao
+        self.percepcao = percepcao
 
     def gastar_energia(self):
         pass
@@ -60,3 +68,5 @@ class Animal(SerVivo):
 class Coelho(Animal):
     def __init__(self , posicao_obj:Posicao  ,):
         super().__init__(posicao_obj , const.ENERGIA_COELHO , const.PERCEPCAO_COELHO)
+        
+        
