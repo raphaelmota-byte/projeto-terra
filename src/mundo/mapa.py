@@ -54,7 +54,17 @@ class Mapa:
        
         
     def __str__(self):
-        return f"largura: {self.largura} , comprimento: {self.comprimento} "
+        mapa_texto = ""
+
+        for linha in self.celulas:
+            for celula in linha:
+                mapa_texto += str(celula) + " "
+            
+            mapa_texto += "\n"
+
+        return mapa_texto
+    
+    
    
    
     
