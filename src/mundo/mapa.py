@@ -1,6 +1,7 @@
 import random
 import config.constantes as const 
 from mundo.posicao import Posicao
+from entidades.entidades import Entidade
 
 
 class Celula:
@@ -8,6 +9,10 @@ class Celula:
         self.posicao = posicao_obj
         self.tipo = tipo
         self.entidades = []
+        
+    def adicionar(self , entidade):
+        self.entidades.append(entidade)
+        
         
     def transformar_em_agua(self):
         self.tipo = "agua"
@@ -26,10 +31,14 @@ class Mapa:
         self.largura = largura
         self.comprimento = comprimento
         self.celulas = self.gerar_celulas() #essa eh a grid
+        self.gerar_agua()
         
         
     def gerar_celulas(self):
        return [ [Celula(Posicao(x , y)) for x in range(self.largura)] for y in range(self.comprimento) ]
+   
+    def obter_celula(self , posicao:Posicao):
+        return self.celulas[posicao.x][posicao.y]
    
     def gerar_agua(self):
         for linha in self.celulas:
@@ -37,9 +46,11 @@ class Mapa:
                 if random.random() < const.CHANCE_AGUA:
                    celula.transformar_em_agua()
 
-    def adicionar_entidade(self , entidade:object):
-        # x , y = entidade.posicao_obj. 
-        pass
+    def adicionar_entidade(self , entidade:Entidade):
+        x = entidade.posicao.x
+        y = entidade.posicao.y
+        
+        self.celulas[x][y].adicionar(entidade)
        
         
     def __str__(self):

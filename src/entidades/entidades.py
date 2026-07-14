@@ -6,7 +6,10 @@ import config.constantes as const
 class Entidade:
     def __init__(self , posicao_obj:Posicao ):
         self.posicao = posicao_obj
-        
+    
+    
+    def __repr__(self):
+        return f"{self.__class__.__name__}(posicao=({self.posicao.x},{self.posicao.y})"
        
         
 
@@ -24,11 +27,14 @@ class SerVivo(Entidade):
         
     def __str__(self) -> str:
         return ( 
-            f"idade: {self.idade} "
-            f"vivo: {self.vivo} "
-            f"posição: {self.posicao}" 
+            f"Ser: {self.__class__.__name__} "
+            f"Idade: {self.idade} "
+            f"Vivo: {self.vivo} "
+            f"Posição:{self.posicao}" 
             )
     
+    def __repr__(self) -> str:
+        return super().__repr__()
     
 class Planta(SerVivo):
     def __init__(self , posicao_obj:Posicao , tamanho:float = 0.0):
@@ -44,10 +50,12 @@ class Planta(SerVivo):
         self.crescer() #Roda crescer
         
     def __str__(self) -> str:
+        
         return (
             f"{super().__str__()} " 
             f"- tamanho: {self.tamanho}"     
             )
+    
     
 class Animal(SerVivo):
     def __init__(self, posicao_obj:Posicao , energia , percepcao):
@@ -68,5 +76,8 @@ class Animal(SerVivo):
 class Coelho(Animal):
     def __init__(self , posicao_obj:Posicao  ,):
         super().__init__(posicao_obj , const.ENERGIA_COELHO , const.PERCEPCAO_COELHO)
+        
+    def __str__(self) -> str:
+        return f"{super().__str__()}"
         
         

@@ -4,4 +4,4 @@ class Posicao:
         self.x = posicao_x  
         self.y = posicao_y
     def __str__(self):
-        return f"posição: ({self.x},{self.y})"
+        return f"({self.x},{self.y})"
