@@ -1,13 +1,19 @@
 import random
 import config.constantes as const 
+from mundo.posicao import Posicao
 
 
 class Celula:
-    def __init__(self  , pos_x , pos_y ,tipo="terra"):
-        self.x = pos_x
-        self.y = pos_y
+    def __init__(self  , posicao:Posicao ,tipo="terra"):
+        self.posicao_obj = posicao
+        self.posicao_coordenadas = posicao.posicao
         self.tipo = tipo
         self.entidades = []
+        
+    def transformar_em_agua(self):
+        self.tipo = "agua"
+        
+ 
         
     def __repr__(self) :
         if self.tipo == "terra":
@@ -24,13 +30,13 @@ class Mapa:
         
         
     def gerar_celulas(self):
-       return [ [Celula(x , y) for x in range(self.largura)] for y in range(self.comprimento) ]
+       return [ [Celula(Posicao(x , y)) for x in range(self.largura)] for y in range(self.comprimento) ]
    
     def gerar_agua(self):
         for linha in self.celulas:
             for celula in linha:
                 if random.random() < const.CHANCE_AGUA:
-                   celula.tipo = "agua"
+                   celula.transformar_em_agua()
        
         
     def __str__(self):
