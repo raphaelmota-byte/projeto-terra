@@ -3,13 +3,18 @@ from mundo.posicao import Posicao
 import config.constantes as const
  
 class Animal(SerVivo):
-    def __init__(self, posicao_obj:Posicao , energia , percepcao):
+    CONSUMO_ENERGIA = 0
+    ENERGIA_INICIAL = 0
+    PERCEPCAO = 0
+    
+    def __init__(self, posicao_obj:Posicao ):
         super().__init__(posicao_obj)
-        self.energia = energia
-        self.percepcao = percepcao
+        self.energia = self.ENERGIA_INICIAL
 
     def gastar_energia(self):
-        pass
+        self.energia -= self.CONSUMO_ENERGIA
+        if self.energia <= 0:
+            self.morrer()
     
     def alimentar(self):
         pass
@@ -19,23 +24,30 @@ class Animal(SerVivo):
 
 
 class Coelho(Animal):
-    def __init__(self , posicao_obj:Posicao ):
-        super().__init__(posicao_obj , const.ENERGIA_COELHO , const.PERCEPCAO_COELHO)
+    PERCEPCAO = const.PERCEPCAO_COELHO
+    ENERGIA_INICIAL = const.ENERGIA_INICIAL_COELHO
+    CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COELHO
+    
+   
         
     def __str__(self) -> str:
         return f"{super().__str__()}"
     
 class Cobra(Animal):
-    def __init__(self, posicao_obj: Posicao):
-        super().__init__(posicao_obj, const.ENERGIA_COBRA, const.PERCEPCAO_COBRA)
+    PERCEPCAO = const.PERCEPCAO_COBRA
+    ENERGIA_INICIAL = const.ENERGIA_INICIAL_COBRA
+    CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COBRA
+    
+  
         
     def __str__(self) -> str:
         return f"{super().__str__()}"
         
         
 class Gaviao(Animal):
-    def __init__(self, posicao_obj: Posicao):
-        super().__init__(posicao_obj, const.ENERGIA_GAVIAO, const.PERCEPCAO_GAVIAO)  
+    PERCEPCAO = const.PERCEPCAO_GAVIAO
+    ENERGIA_INICIAL = const.ENERGIA_INICIAL_GAVIAO
+    CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_GAVIAO
     
     def __str__(self) -> str:
         return super().__str__()

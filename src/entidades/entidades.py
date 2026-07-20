@@ -25,9 +25,9 @@ class SerVivo(Entidade):
         
     def __str__(self) -> str:
         return ( 
-            f"Ser: {self.__class__.__name__} "
-            f"Idade: {self.idade} "
-            f"Vivo: {self.vivo} "
+            f"Espécie:{self.__class__.__name__} | "
+            f"Idade:{self.idade} | "
+            f"Vivo:{self.vivo} | "
             f"Posição:{self.posicao}" 
             )
     

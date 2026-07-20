@@ -1,5 +1,5 @@
 from entidades.planta import Planta
-from entidades.animais import Coelho
+from entidades.animais import Coelho , Cobra , Gaviao
 from mundo.posicao import Posicao
 from mundo.mapa import Mapa
 
@@ -8,27 +8,28 @@ from mundo.mapa import Mapa
 
 mapa = Mapa(16 , 16 )
 
-print(mapa)
+# print(mapa)
 
 
-# planta = Planta(Posicao(1,1))
-# # print(planta)
-
-# mapa.adicionar_entidade(planta)
 
 
-# coelho = Coelho(Posicao(1,1))
-# coelho_2 = Coelho(Posicao(1,1))
-# coelho_3 = Coelho(Posicao(1,1))
 
-# mapa.adicionar_entidade(coelho)
-# mapa.adicionar_entidade(coelho_2)
-# mapa.adicionar_entidade(coelho_3)
 
-# celula = mapa.obter_celula(coelho.posicao)
-# celula = mapa.obter_celula(coelho_2.posicao)
-# celula = mapa.obter_celula(coelho_3.posicao)
+coelho = Coelho(Posicao(1,1))
+cobra = Cobra(Posicao(1,1))
+gaviao = Gaviao(Posicao(1,1))
 
-# for entidade in celula.entidades:
-#     # print(entidade)
-#     pass
+mapa.adicionar_entidade(coelho)
+mapa.adicionar_entidade(cobra)
+mapa.adicionar_entidade(gaviao)
+
+celula = mapa.obter_celula(coelho.posicao)
+[coelho.gastar_energia() for _ in range(1,7)]
+
+for entidade in celula.entidades:
+    print(entidade)
+    print(f"energia inicial:{entidade.ENERGIA_INICIAL}")
+    print(f"energia atual:{entidade.energia}")
+    print(f"percepção:{entidade.PERCEPCAO}")
+    print(f"consumo de energia:{entidade.CONSUMO_ENERGIA}")
+    print("--"*60)
