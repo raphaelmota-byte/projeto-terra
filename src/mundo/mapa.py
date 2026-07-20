@@ -12,6 +12,10 @@ class Celula:
         
     def adicionar(self , entidade):
         self.entidades.append(entidade)
+    
+    def remover(self , entidade):
+        if entidade in self.entidades:
+            self.entidades.remove(entidade)
         
         
     def transformar_em_agua(self):
@@ -30,7 +34,7 @@ class Mapa:
     def __init__(self , largura:int , comprimento:int ) -> None :
         self.largura = largura
         self.comprimento = comprimento
-        self.celulas = self.gerar_celulas() #essa eh a grid
+        self.celulas = self.gerar_celulas() #grid principal
         self.gerar_agua()
         
         
@@ -47,10 +51,13 @@ class Mapa:
                    celula.transformar_em_agua()
 
     def adicionar_entidade(self , entidade:Entidade):
-        x = entidade.posicao.x
-        y = entidade.posicao.y
-        
-        self.celulas[x][y].adicionar(entidade)
+        celula = self.obter_celula(entidade.posicao)
+        celula.adicionar(entidade)
+    
+    
+    def remover_entidade(self , entidade:Entidade):
+        celula = self.obter_celula(entidade.posicao)
+        celula.remover(entidade)
        
         
     def __str__(self):

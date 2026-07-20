@@ -22,7 +22,7 @@ class SerVivo(Entidade):
         meses = (dias//30)
         anos =  (meses//12)
         
-        return f"{dias % 30} dias | { meses % 12} meses| {anos} anos"
+        return f"{self.horas % 24} horas | {dias % 30} dias | { meses % 12} meses| {anos} anos"
         
         
     def envelhecer(self) -> None:
@@ -31,6 +31,9 @@ class SerVivo(Entidade):
     
     def morrer(self):
         self.vivo = False
+    
+    def estar_vivo(self):
+        return self.vivo
         
     def atualizar(self):
         self.envelhecer()

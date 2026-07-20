@@ -3,15 +3,13 @@ from entidades.animais import Coelho , Cobra , Gaviao
 from mundo.posicao import Posicao
 from mundo.mapa import Mapa
 from entidades.entidades import SerVivo
+from mundo.mundo import Mundo
 
 
 
 
 mapa = Mapa(16 , 16 )
-
-# print(mapa)
-
-
+mundo = Mundo(mapa)
 
 
 
@@ -20,14 +18,18 @@ coelho = Coelho(Posicao(1,1))
 cobra = Cobra(Posicao(1,1))
 gaviao = Gaviao(Posicao(1,1))
 
-mapa.adicionar_entidade(coelho)
-mapa.adicionar_entidade(cobra)
-mapa.adicionar_entidade(gaviao)
+
+mundo.adicionar_entidade(coelho)
+mundo.adicionar_entidade(cobra)
+mundo.adicionar_entidade(gaviao)
+
+
+# mundo.remover_entidade(coelho)
 
 celula = mapa.obter_celula(coelho.posicao)
 
-for _ in range(1,100_000):
-    coelho.envelhecer()
+for _ in range(1,7):
+    mundo.atualizar()
     
 for entidade in celula.entidades:
     print(entidade)
