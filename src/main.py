@@ -2,6 +2,7 @@ from entidades.planta import Planta
 from entidades.animais import Coelho , Cobra , Gaviao
 from mundo.posicao import Posicao
 from mundo.mapa import Mapa
+from entidades.entidades import SerVivo
 
 
 
@@ -24,8 +25,10 @@ mapa.adicionar_entidade(cobra)
 mapa.adicionar_entidade(gaviao)
 
 celula = mapa.obter_celula(coelho.posicao)
-[coelho.gastar_energia() for _ in range(1,7)]
 
+for _ in range(1,100_000):
+    coelho.envelhecer()
+    
 for entidade in celula.entidades:
     print(entidade)
     print(f"energia inicial:{entidade.ENERGIA_INICIAL}")

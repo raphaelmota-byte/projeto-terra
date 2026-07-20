@@ -14,19 +14,31 @@ class Entidade:
 class SerVivo(Entidade):
     def __init__(self , posicao_obj:Posicao):
         super().__init__(posicao_obj)
-        self.idade:int = 0
+        self.horas:int = 0
         self.vivo:bool = True
         
+    def mostrar_idade(self):
+        dias =  (self.horas//24)
+        meses = (dias//30)
+        anos =  (meses//12)
+        
+        return f"{dias % 30} dias | { meses % 12} meses| {anos} anos"
+        
+        
     def envelhecer(self) -> None:
-        self.idade += 1
+        self.horas += 3
+       
     
     def morrer(self):
         self.vivo = False
         
+    def atualizar(self):
+        self.envelhecer()
+        
     def __str__(self) -> str:
         return ( 
             f"Espécie:{self.__class__.__name__} | "
-            f"Idade:{self.idade} | "
+            f"Tempo de vida: {self.mostrar_idade()} | "
             f"Vivo:{self.vivo} | "
             f"Posição:{self.posicao}" 
             )

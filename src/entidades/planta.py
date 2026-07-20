@@ -10,10 +10,11 @@ class Planta(SerVivo):
         if self.vivo:
             self.tamanho = round(self.tamanho + 0.2, 1)  # round evita dízimas do float
         
-    def envelhecer(self) -> None:
-        super().envelhecer() # Roda envelhecer de Servivo
-        self.crescer() #Roda crescer
-        
+    
+    def atualizar(self):
+        super().atualizar()
+        self.crescer()
+    
     def __str__(self) -> str:
         
         return (

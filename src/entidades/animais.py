@@ -21,6 +21,10 @@ class Animal(SerVivo):
 
     def reproduzir(self):
         pass
+    
+    def atualizar(self):
+        super().atualizar()
+        self.gastar_energia()
 
 
 class Coelho(Animal):
