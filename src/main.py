@@ -1,8 +1,6 @@
-from entidades.planta import Planta
 from entidades.animais import Coelho , Cobra , Gaviao
 from mundo.posicao import Posicao
 from mundo.mapa import Mapa
-from entidades.entidades import SerVivo
 from mundo.mundo import Mundo
 
 
@@ -11,7 +9,7 @@ from mundo.mundo import Mundo
 mapa = Mapa(16 , 16 )
 mundo = Mundo(mapa)
 
-
+print(mapa)
 
 
 coelho = Coelho(Posicao(1,1))
@@ -28,7 +26,7 @@ mundo.adicionar_entidade(gaviao)
 
 celula = mapa.obter_celula(coelho.posicao)
 
-for _ in range(1,7):
+for _ in range(1,2):
     mundo.atualizar()
     
 for entidade in celula.entidades:

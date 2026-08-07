@@ -4,20 +4,20 @@ from entidades.entidades import Entidade
 class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
         self.mapa = mapa_obj # o mundo contem o mapa
-        self.entidades_mundo = []
+        self.entidades_mundo = [] #lista com todas as entidades do mundo
         
-    def adicionar_entidade(self , entidade:Entidade):
+    def adicionar_entidade(self , entidade:Entidade): # TODO:adicionar verificações de sucesso entre as funções.Serve para atualizar tanto a lista tanto o mapa
         self.entidades_mundo.append(entidade)
-        self.mapa.adicionar_entidade(entidade)
+        self.mapa.adicionar_entidade(entidade) 
         
-    def remover_entidade(self , entidade:Entidade):
+    def remover_entidade(self , entidade:Entidade): # TODO:adicionar verificações de sucesso entre as funções.
         if entidade in self.entidades_mundo:
-            self.entidades_mundo.remove(entidade) # o remove serve pra remover pelo valor
-            self.mapa.remover_entidade(entidade)
+            self.entidades_mundo.remove(entidade) 
+            self.mapa.remover_entidade(entidade) #roda a função da class mapa 
     
     def remover_mortos(self):
         entidades = self.entidades_mundo.copy()
-        
+        # mundo copy para não alterar os indices enquanto mexe nas entidades
         for entidade in entidades:
             if not entidade.estar_vivo():
                 self.remover_entidade(entidade)

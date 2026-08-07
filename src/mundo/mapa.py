@@ -37,19 +37,29 @@ class Mapa:
         self.celulas = self.gerar_celulas() #grid principal
         self.gerar_agua()
         
+    def validar_posicao(self , posicao:Posicao):
+        #uso de raise para quebrar logo o código e evitar bugs invisíveis , que só podem acontecer por error de código e não pelo comportamento dos animais, no futuro.
         
+        posicao_valida_x = (posicao.x < self.largura and posicao.x >= 0 ) 
+        posicao_valida_y = (posicao.y < self.comprimento and posicao.y >= 0 ) 
+        
+        if not(posicao_valida_x) or not(posicao_valida_y) : 
+            raise IndexError(f"a posição X: {posicao.x} deveria ser 0 < pos_x < {self.largura} e a posição Y 0 < pos_y < {self.comprimento} ") 
+        return True
+    
     def gerar_celulas(self):
        return [ [Celula(Posicao(x , y)) for x in range(self.largura)] for y in range(self.comprimento) ]
    
     def obter_celula(self , posicao:Posicao):
-        return self.celulas[posicao.x][posicao.y]
+        if self.validar_posicao(posicao):
+            return self.celulas[posicao.y][posicao.x] # y corresponde a altura (igual o i) e o x funciona como o j
    
     def gerar_agua(self):
         for linha in self.celulas:
             for celula in linha:
-                if random.random() < const.CHANCE_AGUA:
-                   celula.transformar_em_agua()
-
+                if random.random() < const.CHANCE_AGUA: # TODO:adicionar seed fixa para tornar a geração de água determinística
+                    celula.transformar_em_agua()
+                    
     def adicionar_entidade(self , entidade:Entidade):
         celula = self.obter_celula(entidade.posicao)
         celula.adicionar(entidade)
@@ -60,7 +70,7 @@ class Mapa:
         celula.remover(entidade)
        
         
-    def __str__(self):
+    def __str__(self): #como o mapa (hoje) são quadradinhos esse é melhor jeito de imprimi-los 
         mapa_texto = ""
 
         for linha in self.celulas:
