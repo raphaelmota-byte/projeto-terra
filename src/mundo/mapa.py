@@ -24,7 +24,12 @@ class Celula:
  
         
     def __repr__(self) :
-        if self.tipo == "terra":
+        if self.entidades:
+            ultima_entidade = self.entidades[-1]
+            return ultima_entidade.icone
+            
+        
+        elif self.tipo == "terra":
             return "🟩"
         elif self.tipo == "agua":
             return "🟦"

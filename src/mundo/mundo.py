@@ -16,8 +16,10 @@ class Mundo:
             self.mapa.remover_entidade(entidade) #roda a função da class mapa 
     
     def remover_mortos(self):
+        # Copio a lista porque remover_entidade() altera self.entidades_mundo
+        # durante o loop — iterar direto pularia elementos.
+        
         entidades = self.entidades_mundo.copy()
-        # mundo copy para não alterar os indices enquanto mexe nas entidades
         for entidade in entidades:
             if not entidade.estar_vivo():
                 self.remover_entidade(entidade)

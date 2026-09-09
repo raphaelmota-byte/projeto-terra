@@ -32,6 +32,9 @@ class Coelho(Animal):
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COELHO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COELHO
     
+    def __init__(self , posicao_obj):
+        super().__init__(posicao_obj)
+        self.icone = "🐇"
    
         
     def __str__(self) -> str:
@@ -42,7 +45,9 @@ class Cobra(Animal):
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COBRA
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COBRA
     
-  
+    def __init__(self , posicao_obj):
+        super().__init__(posicao_obj)
+        self.icone = "🐍"
         
     def __str__(self) -> str:
         return f"{super().__str__()}"
@@ -52,6 +57,10 @@ class Gaviao(Animal):
     PERCEPCAO = const.PERCEPCAO_GAVIAO
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_GAVIAO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_GAVIAO
+    
+    def __init__(self , posicao_obj):
+        super().__init__(posicao_obj)
+        self.icone = "🦅"
     
     def __str__(self) -> str:
         return super().__str__()

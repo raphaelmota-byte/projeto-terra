@@ -1,0 +1,148 @@
+================================================================================
+                    DOCUMENTACAO DE CLASSES - PROJETO TERRA
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. ARVORE DE CONEXOES DO SISTEMA E HIERARQUIA
+--------------------------------------------------------------------------------
+
+A arquitetura do projeto segue um modelo orientado a objetos com heranca e composicao:
+
+MUNDO (mundo.py)
+ |
+ |-- MAPA (mapa.py) [Composicao]
+ |    |
+ |    |-- CELULA (mapa.py) [Lista 2D: Composicao]
+ |         |
+ |         |-- ENTIDADE [Agregacao - A celula armazena as entidades contidas nela]
+ |
+ |-- ENTIDADES_MUNDO [Lista global de todas as instancias de Entidade]
+
+
+HIERARQUIA DE ENTIDADES (entidades.py, planta.py, animais.py):
+
+ENTIDADE (Classe Base)
+ |
+ |-- SER VIVO (Herda de Entidade)
+      |
+      |-- PLANTA (Herda de Ser Vivo)
+      |
+      |-- ANIMAL (Herda de Ser Vivo)
+           |
+           |-- COELHO (Herda de Animal)
+           |-- COBRA (Herda de Animal)
+           |-- GAVIAO (Herda de Animal)
+
+(Obs: A classe POSICAO e utilizada transversalmente por todas as classes acima 
+para controle de coordenadas).
+
+
+--------------------------------------------------------------------------------
+2. DETALHAMENTO POR MODULO E CLASSE
+--------------------------------------------------------------------------------
+
+-------------------------
+MODULO: mundo.posicao.py
+-------------------------
+Classe: Posicao
+- Proposito: Utilitario base para armazenar e representar coordenadas 2D (X e Y) no grid. 
+  E a referencia espacial para todos os objetos do sistema.
+- Atributos: 
+  * x (int): Eixo horizontal.
+  * y (int): Eixo vertical.
+- Metodos: 
+  * __str__: Formata a impressao visual para (x, y).
+
+-------------------------
+MODULO: mundo.mapa.py
+-------------------------
+Classe: Celula
+- Proposito: Representa um "ladrilho" especifico no grid do mapa. Funciona como 
+  um conteiner geografico.
+- Atributos:
+  * posicao (Posicao): Instancia da coordenada exata.
+  * tipo (str): Define o terreno (ex: "terra", "agua").
+  * entidades (list): Lista de seres vivos que estao ocupando este espaco.
+- Metodos:
+  * adicionar(entidade) / remover(entidade): Gerencia o transito na celula.
+  * transformar_em_agua(): Modifica o estado do terreno.
+  * __repr__: Renderiza emojis (quadrados coloridos) para impressao no terminal.
+
+Classe: Mapa
+- Proposito: Matriz bidimensional que estrutura todo o ambiente fisico e seus limites.
+- Atributos:
+  * largura (int), comprimento (int).
+  * celulas (list): Matriz 2D contendo as instancias de Celula.
+- Metodos:
+  * gerar_celulas(): Constroi a grid no momento da instanciacao.
+  * gerar_agua(): Distribui elementos aquticos aleatoriamente baseado na constante CHANCE_AGUA.
+  * validar_posicao(): Trava de seguranca (IndexError) para coordenadas fora do limite.
+  * obter_celula(posicao): Retorna o objeto Celula de uma coordenada exata.
+  * adicionar_entidade / remover_entidade: Repassa o comando para a celula correspondente.
+
+-------------------------
+MODULO: mundo.mundo.py
+-------------------------
+Classe: Mundo
+- Proposito: E a "Engine" (Motor) principal. Dita o loop principal, o fluxo 
+  do tempo e amarra os agentes ao cenario.
+- Atributos:
+  * mapa (Mapa): Instancia do cenario.
+  * entidades_mundo (list): Registro centralizado de todas as entidades ativas.
+- Metodos:
+  * adicionar_entidade / remover_entidade: Sincroniza a lista global com o mapa.
+  * remover_mortos(): Sistema de "Garbage Collection". Limpa entidades com status vivo=False.
+  * atualizar(): O "tick" do servidor. Itera todos os seres chamando seus metodos 
+    de atualizacao de estado e, em seguida, executa a limpeza dos mortos.
+
+-------------------------
+MODULO: entidades.entidades.py
+-------------------------
+Classe: Entidade
+- Proposito: Objeto mais primitivo do cenario. Qualquer coisa que exista no espaco.
+- Atributos: 
+  * posicao (Posicao): Localizacao do objeto.
+
+Classe: SerVivo (Herda de Entidade)
+- Proposito: Adiciona regras basicas de biologia (passagem do tempo e mortalidade).
+- Atributos Iniciais: 
+  * horas (int): Tempo de existencia.
+  * vivo (bool): Status vital (True/False).
+- Metodos:
+  * mostrar_idade(): Converte e formata as horas brutas em horas, dias, meses e anos.
+  * envelhecer(): Adiciona +3 horas de vida a cada turno.
+  * morrer(): Define vivo como False.
+  * atualizar(): Aciona o envelhecimento a cada turno do Mundo.
+
+-------------------------
+MODULO: entidades.planta.py
+-------------------------
+Classe: Planta (Herda de SerVivo)
+- Proposito: Agente produtor passivo do ecossistema.
+- Atributos extras: 
+  * tamanho (float).
+- Metodos:
+  * crescer(): Aumenta o tamanho em +0.2.
+  * atualizar(): Envelhece (via super()) e cresce a cada turno.
+
+-------------------------
+MODULO: entidades.animais.py
+-------------------------
+Classe: Animal (Herda de SerVivo)
+- Proposito: Agente autonomo que gasta recursos fisicos com a passagem do tempo.
+- Atributos de Classe (Definidos nas filhas): 
+  * CONSUMO_ENERGIA, ENERGIA_INICIAL, PERCEPCAO.
+- Atributos de Instancia: 
+  * energia (int): Dinamico, inicia com o valor de ENERGIA_INICIAL.
+- Metodos:
+  * gastar_energia(): Subtrai energia baseado no consumo padrao. Mata o animal se zerar.
+  * alimentar() / reproduzir(): Comportamentos mapeados para implementacao futura.
+  * atualizar(): Envelhece e deduz a energia.
+
+Classes: Coelho, Cobra e Gaviao (Herdam de Animal)
+- Proposito: Especializacoes concretas da classe Animal.
+- Funcionamento: Elas sobrescrevem as variaveis da classe pai puxando os valores 
+  pre-definidos no arquivo de configuracao (config/constantes.py). Isso balanceia o jogo,
+  permitindo que cada um inicie e gaste energia em ritmos diferentes dependendo de 
+  sua classe na cadeia alimentar.
