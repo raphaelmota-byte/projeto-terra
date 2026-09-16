@@ -1,6 +1,6 @@
-from entidades.entidades import SerVivo
-from mundo.posicao import Posicao
-import config.constantes as const
+from app.engine.entidades.entidades import SerVivo
+from app.engine.mundo.posicao import Posicao
+import app.engine.config.constantes as const
 import random
  
 class Animal(SerVivo):
@@ -57,6 +57,16 @@ class Animal(SerVivo):
     def atualizar(self):
         super().atualizar()
         self.gastar_energia()
+        
+    def to_dict(self):
+        dados = super().to_dict()
+        dados.update({
+            "energia" : self.energia ,
+            "consumo_energia" : self.consumo_energia ,
+            "consumo_reproducao" :  self.consumo_reproducao ,
+            "genero" : self.genero
+        })
+        return dados
 
 
 class Coelho(Animal):
@@ -74,6 +84,11 @@ class Coelho(Animal):
     def __str__(self) -> str:
         return f"{super().__str__()}"
     
+    def to_dict(self):
+        dados = super().to_dict()
+        dados.update({"icone" : self.icone})
+        return dados
+    
 class Cobra(Animal):
     PERCEPCAO = const.PERCEPCAO_COBRA
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COBRA
@@ -86,6 +101,11 @@ class Cobra(Animal):
         
     def __str__(self) -> str:
         return f"{super().__str__()}"
+    
+    def to_dict(self):
+           dados = super().to_dict()
+           dados.update({"icone" : self.icone})
+           return dados
         
         
 class Gaviao(Animal):
@@ -100,3 +120,8 @@ class Gaviao(Animal):
     
     def __str__(self) -> str:
         return super().__str__()
+    
+    def to_dict(self):
+        dados = super().to_dict()
+        dados.update({"icone" : self.icone})
+        return dados

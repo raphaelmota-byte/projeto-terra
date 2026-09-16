@@ -8,7 +8,7 @@ class Celula:
     def __init__(self  , posicao_obj:Posicao ,tipo="terra"):
         self.posicao = posicao_obj
         self.tipo = tipo
-        self.entidades = []
+        self.entidades = [] 
         
     def adicionar(self , entidade):
         self.entidades.append(entidade)
@@ -21,7 +21,12 @@ class Celula:
     def transformar_em_agua(self):
         self.tipo = "agua"
         
- 
+    def to_dict(self):
+        return{
+            "posicao" : self.posicao.to_dict() ,
+            "tipo" : self.tipo ,
+            "entidades_celula" : [entidade.to_dict() for entidade in self.entidades]
+        }
         
     def __repr__(self) :
         if self.entidades:
