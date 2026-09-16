@@ -39,13 +39,35 @@ class Mundo:
         except IndexError:
             pass
         
+    def reproduzir_entidade(self , entidade:Entidade):
+        
+        celula = self.mapa.obter_celula(entidade.posicao)
+        vizinhos = celula.entidades
+        
+        filho = entidade.reproduzir(vizinhos)#type:ignore
+        if filho is not None:
+            self.adicionar_entidade(filho)
+                    
+        
     def atualizar(self):
         entidades = self.entidades_mundo.copy()
         
         for entidade in entidades:
+           # 1. Blindagem Zumbi: Se o bicho morreu neste mesmo turno 
+            # (ex: foi comido por alguém que agiu antes), ignoramos ele.
+            if not entidade.estar_vivo():
+                continue
+            
+            # 2. Atualiza o status básico (gasta energia por existir, envelhece, etc)
             entidade.atualizar()
             
-            if entidade.estar_vivo() and hasattr(entidade , "escolher_proximo_passo"): 
+            # 3. Verifica novamente se ele não morreu de velhice/fome no atualizar()
+            if entidade.estar_vivo():
+                
+                # 4. Tenta reproduzir
+                self.reproduzir_entidade(entidade)
+            
+            if hasattr(entidade , "escolher_proximo_passo"): 
                 nova_pos = entidade.escolher_proximo_passo()
                 self.mover_entidade_fisicamente(entidade , nova_pos)
                 

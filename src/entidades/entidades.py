@@ -34,6 +34,10 @@ class SerVivo(Entidade):
     
     def estar_vivo(self):
         return self.vivo
+    
+    def reproduzir(self):
+            #vazio para ser rescrita pelos filhos
+        return None
         
     def atualizar(self):
         self.envelhecer()
