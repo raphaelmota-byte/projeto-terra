@@ -1,5 +1,6 @@
 ================================================================================
                     DOCUMENTACAO DE CLASSES - PROJETO TERRA
+                     (Incluindo Camada de API e Frontend)
 ================================================================================
 
 
@@ -7,17 +8,22 @@
 1. ARVORE DE CONEXOES DO SISTEMA E HIERARQUIA
 --------------------------------------------------------------------------------
 
-A arquitetura do projeto segue um modelo orientado a objetos com heranca e composicao:
+A arquitetura do projeto agora é dividida em Back-end (Motor + API) e Front-end.
 
-MUNDO (mundo.py)
+FRONT-END (React + Bootstrap)
+ |  [Comunicação via HTTP / JSON]
+ v
+API (main.py - FastAPI) [Gerencia as rotas HTTP e segura o estado do Mundo]
  |
- |-- MAPA (mapa.py) [Composicao]
- |    |
- |    |-- CELULA (mapa.py) [Lista 2D: Composicao]
- |         |
- |         |-- ENTIDADE [Agregacao - A celula armazena as entidades contidas nela]
- |
- |-- ENTIDADES_MUNDO [Lista global de todas as instancias de Entidade]
+ |-- MUNDO (mundo.py) [Motor da Simulação]
+     |
+     |-- MAPA (mapa.py) [Composicao]
+     |    |
+     |    |-- CELULA (mapa.py) [Lista 2D: Composicao]
+     |         |
+     |         |-- ENTIDADE [Agregacao - A celula armazena as entidades contidas nela]
+     |
+     |-- ENTIDADES_MUNDO [Lista global de todas as instancias de Entidade]
 
 
 HIERARQUIA DE ENTIDADES (entidades.py, planta.py, animais.py):
@@ -33,9 +39,6 @@ ENTIDADE (Classe Base)
            |-- COELHO (Herda de Animal)
            |-- COBRA (Herda de Animal)
            |-- GAVIAO (Herda de Animal)
-
-(Obs: A classe POSICAO e utilizada transversalmente por todas as classes acima 
-para controle de coordenadas).
 
 
 --------------------------------------------------------------------------------
@@ -53,6 +56,7 @@ Classe: Posicao
   * y (int): Eixo vertical.
 - Metodos: 
   * __str__: Formata a impressao visual para (x, y).
+  * to_dict() [NOVO]: Retorna um dicionario com {"x": x, "y": y} para o JSON.
 
 -------------------------
 MODULO: mundo.mapa.py
@@ -68,6 +72,7 @@ Classe: Celula
   * adicionar(entidade) / remover(entidade): Gerencia o transito na celula.
   * transformar_em_agua(): Modifica o estado do terreno.
   * __repr__: Renderiza emojis (quadrados coloridos) para impressao no terminal.
+  * to_dict() [NOVO]: Serializa o tipo de terreno e aciona o to_dict() de todas as entidades presentes.
 
 Classe: Mapa
 - Proposito: Matriz bidimensional que estrutura todo o ambiente fisico e seus limites.
@@ -76,7 +81,7 @@ Classe: Mapa
   * celulas (list): Matriz 2D contendo as instancias de Celula.
 - Metodos:
   * gerar_celulas(): Constroi a grid no momento da instanciacao.
-  * gerar_agua(): Distribui elementos aquticos aleatoriamente baseado na constante CHANCE_AGUA.
+  * gerar_agua(): Distribui elementos aquaticos aleatoriamente baseado na constante CHANCE_AGUA.
   * validar_posicao(): Trava de seguranca (IndexError) para coordenadas fora do limite.
   * obter_celula(posicao): Retorna o objeto Celula de uma coordenada exata.
   * adicionar_entidade / remover_entidade: Repassa o comando para a celula correspondente.
@@ -95,6 +100,7 @@ Classe: Mundo
   * remover_mortos(): Sistema de "Garbage Collection". Limpa entidades com status vivo=False.
   * atualizar(): O "tick" do servidor. Itera todos os seres chamando seus metodos 
     de atualizacao de estado e, em seguida, executa a limpeza dos mortos.
+  * to_dict() [NOVO]: Itera o mapa inteiro e converte a matriz 2D de objetos Celula em uma matriz 2D de dicionarios para a API enviar ao front.
 
 -------------------------
 MODULO: entidades.entidades.py
@@ -113,7 +119,9 @@ Classe: SerVivo (Herda de Entidade)
   * mostrar_idade(): Converte e formata as horas brutas em horas, dias, meses e anos.
   * envelhecer(): Adiciona +3 horas de vida a cada turno.
   * morrer(): Define vivo como False.
+  * reproduzir(): Metodo base que define a capacidade de gerar descendentes na simulacao.
   * atualizar(): Aciona o envelhecimento a cada turno do Mundo.
+  * to_dict() [NOVO]: Retorna especie (nome da classe), status vital e horas de vida.
 
 -------------------------
 MODULO: entidades.planta.py
@@ -137,12 +145,31 @@ Classe: Animal (Herda de SerVivo)
   * energia (int): Dinamico, inicia com o valor de ENERGIA_INICIAL.
 - Metodos:
   * gastar_energia(): Subtrai energia baseado no consumo padrao. Mata o animal se zerar.
-  * alimentar() / reproduzir(): Comportamentos mapeados para implementacao futura.
+  * alimentar(): Comportamento mapeado para implementacao futura.
+  * reproduzir(): Sobrescreve o metodo da classe pai, adicionando condicoes especificas para animais (ex: gasto de energia para gerar o filhote, necessidade de proximidade).
   * atualizar(): Envelhece e deduz a energia.
+  * to_dict() [NOVO]: Usa o to_dict() do SerVivo e adiciona o valor atual de energia.
 
 Classes: Coelho, Cobra e Gaviao (Herdam de Animal)
 - Proposito: Especializacoes concretas da classe Animal.
 - Funcionamento: Elas sobrescrevem as variaveis da classe pai puxando os valores 
-  pre-definidos no arquivo de configuracao (config/constantes.py). Isso balanceia o jogo,
-  permitindo que cada um inicie e gaste energia em ritmos diferentes dependendo de 
-  sua classe na cadeia alimentar.
+  pre-definidos no arquivo de configuracao.
+
+
+--------------------------------------------------------------------------------
+3. CAMADA DE API (FASTAPI) E COMUNICACAO
+--------------------------------------------------------------------------------
+MODULO: app/main.py
+- Proposito: Ponto de entrada do servidor web. Conecta a Engine do Projeto Terra 
+  com requisicoes HTTP vindas do React.
+- Variavel Global:
+  * simulacao_atual: Mantem a instancia de Mundo viva na memoria do servidor.
+
+Rotas (Endpoints):
+- POST /iniciar: 
+  * Acao: Instancia Mundo(largura, altura) e sobrescreve a variavel simulacao_atual.
+- POST /tick: 
+  * Acao: Chama simulacao_atual.atualizar() para processar 1 turno de tempo.
+- GET /estado: 
+  * Acao: Chama simulacao_atual.to_dict() e o FastAPI automaticamente traduz
+    o dicionario resultante para um arquivo JSON entregue ao front-end.
