@@ -213,6 +213,24 @@ Project Terra was created to explore concepts such as:
 The long-term objective is to build a modular simulation framework capable of supporting increasingly sophisticated ecosystems.
 
 ---
+
+## 📈 Future Vision
+
+Project Terra is designed to evolve far beyond a simple ecosystem simulation.
+
+Planned future features include:
+
+- Multiple ecosystems
+- Rivers and terrain generation
+- Weather and climate
+- Disease simulation
+- Evolution and genetics
+- Social behaviors
+- Machine Learning agents
+- Distributed simulations
+- Real-time visualization
+
+---
 ## ▶️ Getting Started
 
 Clone the repository:
@@ -232,24 +250,7 @@ Bash
 uv run uvicorn app.main:app --reload
 Access the interactive API documentation in your browser:
 http://localhost:8000/docs
-
-## 📈 Future Vision
-
-Project Terra is designed to evolve far beyond a simple ecosystem simulation.
-
-Planned future features include:
-
-- Multiple ecosystems
-- Rivers and terrain generation
-- Weather and climate
-- Disease simulation
-- Evolution and genetics
-- Social behaviors
-- Machine Learning agents
-- Distributed simulations
-- Real-time visualization
-
----
+```
 
 ## 🤝 Contributing
 
