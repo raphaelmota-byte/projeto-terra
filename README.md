@@ -100,17 +100,19 @@ This deterministic execution order ensures consistent and reproducible simulatio
 ```
 Project-Terra/
 │
-├── src/
-│   ├── config/
-│   ├── engine/
-│   ├── entities/
-│   ├── world/
-│   └── utils/
+├── app/                 # Camada da API (FastAPI)
+│   ├── main.py          # Entrypoint do servidor e Rotas
+│   └── engine/          # Motor da Simulação (Core)
+│       ├── config/
+│       ├── entities/
+│       ├── world/
+│       └── utils/
 │
+├── frontend/            # Interface em React + Bootstrap (Em breve)
 ├── docs/
 ├── tests/
 ├── README.md
-└── requirements.txt
+└── pyproject.toml       # Gerenciamento de dependências com uv
 ```
 
 ### Engine
@@ -143,8 +145,8 @@ Utility modules shared across the project.
 - [x] Grid-based map
 - [x] Cell system
 - [x] Entity hierarchy
-- [ ] Tick engine
-- [ ] World scheduler
+- [x] Tick engine
+- [x] World scheduler
 
 ### Environment
 
@@ -165,11 +167,10 @@ Utility modules shared across the project.
 - [ ] Snake behavior
 - [ ] Hawk behavior
 - [ ] Hunting system
-- [ ] Reproduction system
+- [x] Reproduction system
 
 ### Future
 
-- [ ] FastAPI API
 - [ ] PostgreSQL persistence
 - [ ] Real-time visualization
 - [ ] Artificial Intelligence agents
@@ -179,11 +180,19 @@ Utility modules shared across the project.
 
 ---
 
+### Future / Web Integration
+- [x] API with FastAPI and JSON serialization
+- [ ] Visual interface with React and Bootstrap
+- [ ] PostgreSQL persistence
+- [ ] Artificial Intelligence agents
+
 ## 💻 Technologies
 
-- Python
+- Python 3.11+
 - Object-Oriented Programming
-- FastAPI *(planned)*
+- FastAPI (Backend API)
+- React & Bootstrap (Frontend)
+- uv (Package & Environment Manager)
 - PostgreSQL *(planned)*
 
 ---
@@ -204,28 +213,25 @@ Project Terra was created to explore concepts such as:
 The long-term objective is to build a modular simulation framework capable of supporting increasingly sophisticated ecosystems.
 
 ---
-
 ## ▶️ Getting Started
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/project-terra.git
-```
 
-Enter the project directory:
-
-```bash
+git clone [https://github.com/RaphaelMota-bit/project-terra.git](https://github.com/RaphaelMota-bit/project-terra.git)
 cd project-terra
-```
+Set up the environment and dependencies (using uv):
 
-Run the project:
+Bash
+uv venv
+uv sync
+Run the API server:
 
-```bash
-python src/main.py
-```
-
----
+Bash
+uv run uvicorn app.main:app --reload
+Access the interactive API documentation in your browser:
+http://localhost:8000/docs
 
 ## 📈 Future Vision
 
