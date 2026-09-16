@@ -1,6 +1,7 @@
 from entidades.entidades import SerVivo
 from mundo.posicao import Posicao
 import config.constantes as const
+import random
  
 class Animal(SerVivo):
     CONSUMO_ENERGIA = 0
@@ -10,6 +11,12 @@ class Animal(SerVivo):
     def __init__(self, posicao_obj:Posicao ):
         super().__init__(posicao_obj)
         self.energia = self.ENERGIA_INICIAL
+        
+    def escolher_proximo_passo(self):
+        movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
+        dx , dy = random.choice(movimentos)
+        return Posicao(self.posicao.x + dx, self.posicao.y + dy)
+        
 
     def gastar_energia(self):
         self.energia -= self.CONSUMO_ENERGIA

@@ -5,6 +5,7 @@ class Planta(SerVivo):
     def __init__(self , posicao_obj:Posicao , tamanho:float = 0.0):
         super().__init__(posicao_obj)
         self.tamanho = tamanho
+        self.icone = "🌲"
     
     def crescer(self) -> None:
         if self.vivo:

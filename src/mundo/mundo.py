@@ -1,5 +1,6 @@
 from mundo.mapa import Mapa
 from entidades.entidades import Entidade
+from mundo.posicao import Posicao
 
 class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
@@ -23,12 +24,31 @@ class Mundo:
         for entidade in entidades:
             if not entidade.estar_vivo():
                 self.remover_entidade(entidade)
+                
+    def mover_entidade_fisicamente(self , entidade:Entidade , nova_pos:Posicao):
+        #uso o try porque o metodo validar_posicao sobe um error quando falso
+        try:
+            self.mapa.validar_posicao(nova_pos)
+            
+            self.mapa.remover_entidade(entidade)
+            
+            entidade.posicao = nova_pos
     
+            self.mapa.adicionar_entidade(entidade)
+            
+        except IndexError:
+            pass
+        
     def atualizar(self):
         entidades = self.entidades_mundo.copy()
         
         for entidade in entidades:
             entidade.atualizar()
+            
+            if entidade.estar_vivo() and hasattr(entidade , "escolher_proximo_passo"): 
+                nova_pos = entidade.escolher_proximo_passo()
+                self.mover_entidade_fisicamente(entidade , nova_pos)
+                
         self.remover_mortos()
         
     def __str__(self):
