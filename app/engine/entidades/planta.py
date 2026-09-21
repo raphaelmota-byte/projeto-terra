@@ -1,5 +1,5 @@
-from entidades.entidades import SerVivo
-from mundo.posicao import Posicao
+from .entidades import SerVivo
+from ..mundo.posicao import Posicao
 
 class Planta(SerVivo):
     def __init__(self , posicao_obj:Posicao , tamanho:float = 0.0):

@@ -1,13 +1,17 @@
-from app.engine.mundo.posicao import Posicao
-import app.engine.config.constantes as const
+from ..mundo.posicao import Posicao
+from ..config import constantes as const
 from typing import Any
 
 class Entidade:
     def __init__(self , posicao_obj:Posicao ):
         self.posicao = posicao_obj
+        self.nome = self.__class__.__name__,
     
     def to_dict(self):
-        return {"posicao_entidade" : self.posicao.to_dict()}
+        return {
+            "posicao_entidade" : self.posicao.to_dict() ,
+            "nome_entidade" : self.nome
+            }
     
     def __repr__(self):
         return f"{self.__class__.__name__}(posicao=({self.posicao.x},{self.posicao.y})"

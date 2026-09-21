@@ -1,6 +1,6 @@
-from app.engine.entidades.entidades import SerVivo
-from app.engine.mundo.posicao import Posicao
-import app.engine.config.constantes as const
+from .entidades import SerVivo
+from ..mundo.posicao import Posicao
+from ..config import constantes as const
 import random
  
 class Animal(SerVivo):

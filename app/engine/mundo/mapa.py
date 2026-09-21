@@ -1,7 +1,7 @@
 import random
-import config.constantes as const 
-from mundo.posicao import Posicao
-from entidades.entidades import Entidade
+from ..config import constantes as const 
+from .posicao import Posicao
+from ..entidades.entidades import Entidade
 
 
 class Celula:
@@ -90,6 +90,18 @@ class Mapa:
             mapa_texto += "\n"
 
         return mapa_texto
+    
+    def to_dict(self):
+        mapa_serializado = []
+        for linha in self.celulas:
+            linha_serializada = []
+            for celula in linha:
+                linha_serializada.append(celula.to_dict())
+                
+            mapa_serializado.append(linha_serializada)
+        return mapa_serializado
+        
+        
     
     
    

@@ -1,6 +1,6 @@
-from mundo.mapa import Mapa
-from entidades.entidades import Entidade
-from mundo.posicao import Posicao
+from .mapa import Mapa
+from .posicao import Posicao
+from ..entidades.entidades import Entidade
 
 class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
@@ -75,3 +75,9 @@ class Mundo:
         
     def __str__(self):
         return f"o mundo possui {len(self.entidades_mundo)} entidades"
+    
+    def to_dict(self):
+        return{
+            "mapa" : self.mapa.to_dict() ,
+            "total_entidades" : len(self.entidades_mundo)
+        }

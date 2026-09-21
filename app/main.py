@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from .engine.mundo.posicao import Posicao
 from .engine.entidades.entidades import Entidade , SerVivo
-from .engine.entidades.animais import Animal , Coelho , Cobra , Gaviao
-
+from .engine.entidades.animais import Coelho , Cobra , Gaviao
+from .engine.mundo.mundo import Mundo
+from .engine.mundo.mapa import Mapa
 
 app = FastAPI()
 
@@ -28,4 +29,21 @@ def testar_animal():
         "coelho" : coelho.to_dict() ,
         "cobra" : cobra.to_dict() ,
         "gaviao" : gaviao.to_dict()
+    }
+    
+@app.get("/teste_mapa")
+def teste_mapa():
+    tamanho_mapa = 2
+
+    mapa = Mapa(tamanho_mapa , tamanho_mapa )
+    mundo = Mundo(mapa)
+    
+    pos = Posicao(1 , 1)
+    coelho = Coelho(pos)
+    
+    mundo.adicionar_entidade(coelho)
+    celula = mapa.obter_celula(pos)
+    
+    return{
+        "mundo" : mundo.to_dict()
     }
