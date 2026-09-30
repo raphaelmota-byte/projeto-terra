@@ -1,11 +1,11 @@
 import time
 import os
 
-from entidades.animais import Coelho , Cobra , Gaviao
-from entidades.planta import Planta
-from mundo.posicao import Posicao
-from mundo.mapa import Mapa
-from mundo.mundo import Mundo
+from .entidades.animais import Coelho, Cobra, Gaviao
+from .entidades.planta import Planta
+from .mundo.posicao import Posicao
+from .mundo.mapa import Mapa
+from .mundo.mundo import Mundo
 import random
 
 
