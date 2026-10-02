@@ -6,6 +6,7 @@ class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
         self.mapa = mapa_obj # o mundo contem o mapa
         self.entidades_mundo = [] #lista com todas as entidades do mundo
+        self.horas_passadas = 0
         
     def adicionar_entidade(self , entidade:Entidade): # TODO:adicionar verificações de sucesso entre as funções.Serve para atualizar tanto a lista tanto o mapa
         self.entidades_mundo.append(entidade)
@@ -50,6 +51,7 @@ class Mundo:
                     
         
     def atualizar(self):
+        self.horas_passadas += 3
         entidades = self.entidades_mundo.copy()
         
         for entidade in entidades:
@@ -79,5 +81,6 @@ class Mundo:
     def to_dict(self):
         return{
             "mapa" : self.mapa.to_dict() ,
-            "total_entidades" : len(self.entidades_mundo)
+            "total_entidades" : len(self.entidades_mundo),
+            "horas_passadas" : self.horas_passadas
         }

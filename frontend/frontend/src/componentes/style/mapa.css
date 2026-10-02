@@ -1,17 +1,26 @@
+/* NOVO: Limita a largura ao tamanho da tela e cria o scroll horizontal */
+.mapa-container {
+  max-width: 100vw; /* Garante que não ultrapasse a largura total da tela */
+  overflow-x: auto; /* Cria a barra de rolagem apenas se o tabuleiro for maior */
+  padding: 10px;    /* Dá um respiro para a barra de rolagem */
+}
+
 /* Container principal do mapa */
 .tabuleiro {
   display: grid;
-  /* Cria as colunas automaticamente baseado no tamanho que vier do backend */
-  grid-template-columns: repeat(16, 30px); 
   gap: 4px;
   background-color: #2c3e50;
   padding: 10px;
   border-radius: 8px;
-  width: fit-content;  /*faz com que um elemento ajuste a sua largura exatamente ao tamanho do conteúdo interno */
-  margin: 0 auto; /* Centraliza na tela */
+  
+  /* Mudamos de fit-content para min-content para garantir que o grid 
+     não encolha as células se o container for menor */
+  width: min-content;  
+  
+  margin: 0 auto;
 }
 
-/* Quadrado individual */
+/* Quadrado individual (com os 45px) */
 .celula {
   width: 30px;
   height: 30px;
@@ -19,8 +28,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 18px;
 }
+
 
 .terreno-terra {
   background-color: #d3b8ae; /* Marrom claro para você ver que a célula está lá */
