@@ -23,3 +23,7 @@ class Planta(SerVivo):
             f"- tamanho: {self.tamanho}"     
             )
     
+    def to_dict(self):
+        dados = super().to_dict()
+        dados.update({"tamanho" : self.tamanho})
+        return dados

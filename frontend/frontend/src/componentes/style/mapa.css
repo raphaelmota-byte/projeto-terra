@@ -1,0 +1,31 @@
+/* Container principal do mapa */
+.tabuleiro {
+  display: grid;
+  /* Cria as colunas automaticamente baseado no tamanho que vier do backend */
+  grid-template-columns: repeat(16, 30px); 
+  gap: 4px;
+  background-color: #2c3e50;
+  padding: 10px;
+  border-radius: 8px;
+  width: fit-content;  /*faz com que um elemento ajuste a sua largura exatamente ao tamanho do conteúdo interno */
+  margin: 0 auto; /* Centraliza na tela */
+}
+
+/* Quadrado individual */
+.celula {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.terreno-terra {
+  background-color: #d3b8ae; /* Marrom claro para você ver que a célula está lá */
+}
+
+.terreno-agua{
+  background-color: #0077BE;
+}

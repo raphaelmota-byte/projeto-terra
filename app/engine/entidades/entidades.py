@@ -42,11 +42,11 @@ class SerVivo(Entidade):
     def estar_vivo(self):
         return self.vivo
     
-    def reproduzir(self):
+    def reproduzir(self , vizinhos):
             #vazio para ser rescrita pelos filhos
         return None
         
-    def atualizar(self):
+    def atualizar(self ):
         self.envelhecer()
         
     def __str__(self) -> str:
