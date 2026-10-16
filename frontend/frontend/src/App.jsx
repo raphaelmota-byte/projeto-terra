@@ -20,7 +20,7 @@ function App() {
       setAlerta(null)
     }
     catch(erro){
-      setAlerta("O estado do mundo não pode ser atualizado, por favor confira sua conexão.");
+      setAlerta("O mundo ainda não foi carregador, por favor confira sua conexão ou clique em iniciar.");
     }
   };
 

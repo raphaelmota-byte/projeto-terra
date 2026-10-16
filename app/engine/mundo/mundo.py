@@ -30,15 +30,16 @@ class Mundo:
         #uso o try porque o metodo validar_posicao sobe um error quando falso
         try:
             self.mapa.validar_posicao(nova_pos)
-            
-            self.mapa.remover_entidade(entidade)
-            
-            entidade.posicao = nova_pos
-    
-            self.mapa.adicionar_entidade(entidade)
-            
         except IndexError:
-            pass
+            return
+            
+        if self.mapa.tem_agua(nova_pos):
+            return
+    
+        self.mapa.remover_entidade(entidade)
+        entidade.posicao = nova_pos
+        self.mapa.adicionar_entidade(entidade)
+            
         
     def reproduzir_entidade(self , entidade:Entidade):
         

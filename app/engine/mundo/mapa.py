@@ -53,9 +53,19 @@ class Mapa:
         posicao_valida_x = (posicao.x < self.largura and posicao.x >= 0 ) 
         posicao_valida_y = (posicao.y < self.comprimento and posicao.y >= 0 ) 
         
+        
         if not(posicao_valida_x) or not(posicao_valida_y) : 
-            raise IndexError(f"a posição X: {posicao.x} deveria ser 0 < pos_x < {self.largura} e a posição Y 0 < pos_y < {self.comprimento} ") 
+            raise IndexError(f"a posição X: {posicao.x} deveria ser (0 < pos_x < {self.largura}) e a posição Y (0 < pos_y < {self.comprimento}) ") 
+        
         return True
+    
+    def tem_agua(self , posicao:Posicao):
+        celula = self.obter_celula(posicao)
+        
+        if celula.tipo == "agua":
+            return True
+        
+        return False        
     
     def gerar_celulas(self):
        return [ [Celula(Posicao(x , y)) for x in range(self.largura)] for y in range(self.comprimento) ]
@@ -78,6 +88,19 @@ class Mapa:
     def remover_entidade(self , entidade:Entidade):
         celula = self.obter_celula(entidade.posicao)
         celula.remover(entidade)
+        
+    def obter_posicao_terra_aleatoria(self) -> Posicao:
+        limite_x = self.largura - 1
+        limite_y = self.comprimento - 1
+        
+        while True:
+            x = random.randint(0, limite_x)
+            y = random.randint(0, limite_y)
+            pos = Posicao(x, y)
+            
+            # Garante que a posição sorteada não seja água
+            if not self.tem_agua(pos):
+                return pos
        
         
     def __str__(self): #como o mapa (hoje) são quadradinhos esse é melhor jeito de imprimi-los 

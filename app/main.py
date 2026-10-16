@@ -31,30 +31,25 @@ def iniciar_mundo(dados:IniciarMundo):
     
     mapa = Mapa(tamanho_mapa, tamanho_mapa)
     simulacao_atual = Mundo(mapa)
-    limite = tamanho_mapa - 1
     
     # Adicionando os coelhos
     for _ in range(11):
-        cord_x = random.randint(0, limite)
-        cord_y = random.randint(0, limite)
-        simulacao_atual.adicionar_entidade(Coelho(Posicao(cord_x, cord_y)))
+        pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
+        simulacao_atual.adicionar_entidade(Coelho(pos))
 
     # Criando as Cobras 
     for _ in range(9):
-        cord_x = random.randint(0, limite)
-        cord_y = random.randint(0, limite)
-        simulacao_atual.adicionar_entidade(Cobra(Posicao(cord_x, cord_y)))
+        pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
+        simulacao_atual.adicionar_entidade(Cobra(pos))
 
     # Criando os Gaviões
     for _ in range(5):
-        cord_x = random.randint(0, limite)
-        cord_y = random.randint(0, limite)
-        simulacao_atual.adicionar_entidade(Gaviao(Posicao(cord_x, cord_y)))
+        pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
+        simulacao_atual.adicionar_entidade(Gaviao(pos))
     
     for _ in range(10):
-        cord_x = random.randint(0, limite)
-        cord_y = random.randint(0, limite)
-        simulacao_atual.adicionar_entidade(Planta(Posicao(cord_x, cord_y)))
+        pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
+        simulacao_atual.adicionar_entidade(Planta(pos))
         
     return {"mensagem": "Mundo iniciado com sucesso"}
 
