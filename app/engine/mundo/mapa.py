@@ -1,14 +1,16 @@
 import random
+from typing import Literal
 from ..config import constantes as const 
 from .posicao import Posicao
 from ..entidades.entidades import Entidade
 
+TipoTerreno = Literal["terra", "agua"]
 
 class Celula:
-    def __init__(self  , posicao_obj:Posicao ,tipo="terra"):
+    def __init__(self  , posicao_obj:Posicao ,tipo: TipoTerreno="terra"):
         self.posicao = posicao_obj
         self.tipo = tipo
-        self.entidades = [] 
+        self.entidades: list[Entidade] = [] 
         
     def adicionar(self , entidade):
         self.entidades.append(entidade)
@@ -21,7 +23,7 @@ class Celula:
     def transformar_em_agua(self):
         self.tipo = "agua"
         
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return{
             "posicao" : self.posicao.to_dict() ,
             "tipo" : self.tipo ,
@@ -31,7 +33,8 @@ class Celula:
     def __repr__(self) :
         if self.entidades:
             ultima_entidade = self.entidades[-1]
-            return ultima_entidade.icone
+            # getattr garante que o código não quebre em runtime caso o atributo não exista
+            return getattr(ultima_entidade, "icone", "❓")
             
         
         elif self.tipo == "terra":
@@ -47,7 +50,7 @@ class Mapa:
         self.celulas = self.gerar_celulas() #grid principal
         self.gerar_agua()
         
-    def validar_posicao(self , posicao:Posicao):
+    def validar_posicao(self , posicao:Posicao) -> bool:
         #uso de raise para quebrar logo o código e evitar bugs invisíveis , que só podem acontecer por error de código e não pelo comportamento dos animais, no futuro.
         
         posicao_valida_x = (posicao.x < self.largura and posicao.x >= 0 ) 
@@ -59,7 +62,7 @@ class Mapa:
         
         return True
     
-    def tem_agua(self , posicao:Posicao):
+    def tem_agua(self , posicao:Posicao) -> bool:
         celula = self.obter_celula(posicao)
         
         if celula.tipo == "agua":
@@ -67,25 +70,25 @@ class Mapa:
         
         return False        
     
-    def gerar_celulas(self):
+    def gerar_celulas(self) -> list[list[Celula]] :
        return [ [Celula(Posicao(x , y)) for x in range(self.largura)] for y in range(self.comprimento) ]
    
-    def obter_celula(self , posicao:Posicao):
+    def obter_celula(self , posicao:Posicao) -> Celula|None:
         if self.validar_posicao(posicao):
             return self.celulas[posicao.y][posicao.x] # y corresponde a altura (igual o i) e o x funciona como o j
    
-    def gerar_agua(self):
+    def gerar_agua(self) -> None:
         for linha in self.celulas:
             for celula in linha:
                 if random.random() < const.CHANCE_AGUA: # TODO:adicionar seed fixa para tornar a geração de água determinística
                     celula.transformar_em_agua()
                     
-    def adicionar_entidade(self , entidade:Entidade):
+    def adicionar_entidade(self , entidade:Entidade) -> None:
         celula = self.obter_celula(entidade.posicao)
         celula.adicionar(entidade)
     
     
-    def remover_entidade(self , entidade:Entidade):
+    def remover_entidade(self , entidade:Entidade) -> None:
         celula = self.obter_celula(entidade.posicao)
         celula.remover(entidade)
         
@@ -114,7 +117,7 @@ class Mapa:
 
         return mapa_texto
     
-    def to_dict(self):
+    def to_dict(self) -> list[list[dict]]:
         mapa_serializado = []
         for linha in self.celulas:
             linha_serializada = []

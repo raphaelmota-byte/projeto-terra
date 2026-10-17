@@ -24,9 +24,21 @@ class Animal(SerVivo):
         if self.energia <= 0:
             self.morrer()
     
-    def alimentar(self):
-        pass
-
+    def alimentar(self , vizinhos):
+        for vizinho in vizinhos:
+          if vizinho.__class__.__name__ == self.alvo_presa: #type:ignore
+            dado = random.randint(1, 100)
+            # print(f" -> Dado rolou {dado} (precisava de <= {self.chance_predacao})")
+            if dado <= self.chance_predacao: #type:ignore
+                vizinho.morrer()  # A presa tem o status vivo=False e será limpa pelo motor
+                
+                valor_base = vizinho.ENERGIA_INICIAL 
+                bonus_gordura = vizinho.energia * const.BONUS_GORDURA 
+                total_refeicao = valor_base + bonus_gordura
+                
+                self.energia = min(self.energia + total_refeicao , self.ENERGIA_INICIAL) #type:ignore
+                
+            break
     def reproduzir(self, vizinhos):
         # 1. Apenas fêmeas dão à luz
         if self.genero != "F":
@@ -74,12 +86,42 @@ class Coelho(Animal):
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COELHO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COELHO
     CONSUMO_REPRODUCAO = const.ENERGIA_REPRODUCAO_COELHO
+    CHANCE_PREDACAO = const.CHANCE_PREDACAO_COELHO_ARVORE
     
     def __init__(self , posicao_obj , genero=None):
         super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
         self.icone = "🐇" if self.genero == "M" else "🐰"
-   
-    
+        self.alvo_presa = "Planta"
+        self.chance_predacao = self.CHANCE_PREDACAO
+        
+    def alimentar(self, vizinhos):
+        for vizinho in vizinhos:
+            # 1. Filtro da Dieta (Garante que só come Planta)
+            if vizinho.__class__.__name__ == self.alvo_presa:
+                
+                # LOG: Mostra o coelho achando a planta
+                # print(f"[Coelho ({self.energia} energia)] começou a comer uma Planta (Tamanho atual: {vizinho.tamanho:.1f})!")
+                
+                # 2. O Consumo (Sem probabilidade de erro)
+                # O coelho tira uma "mordida" fixa do tamanho da planta
+                mordida = const.MORDIDA_COELHO 
+                vizinho.tamanho -= mordida
+                
+                # 3. Verificação de Morte da Planta
+                if vizinho.tamanho <= 0:
+                    vizinho.morrer() # A planta foi totalmente devorada e sairá do mapa
+                    print(" -> A planta foi totalmente consumida e morreu!")
+                
+                # 4. A Digestão
+                # O coelho ganha uma quantidade fixa de energia por cada mordida que dá
+                ganho_por_mordida = const.GANHO_ENERGIA_MORDIDA 
+                self.energia = min(self.energia + ganho_por_mordida, self.ENERGIA_INICIAL)
+                
+                print(f" -> REFEIÇÃO SUCESSO! Nova energia do coelho: {self.energia}")
+                
+                # 5. A Trava (1 contra 1)
+                # O coelho só morde uma planta por turno e encerra a ação
+                break
         
     def __str__(self) -> str:
         return f"{super().__str__()}"
@@ -94,11 +136,15 @@ class Cobra(Animal):
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COBRA
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COBRA
     CONSUMO_REPRODUCAO = const.ENERGIA_REPRODUCAO_COBRA
+    CHANCE_PREDACAO = const.CHANCE_PREDACAO_COBRA_COELHO
     
     def __init__(self , posicao_obj , genero=None):
         super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
         self.icone = "🐍" if self.genero == "M" else "🐉"
-        
+        self.alvo_presa = "Coelho"
+        self.chance_predacao = self.CHANCE_PREDACAO
+    
+    
     def __str__(self) -> str:
         return f"{super().__str__()}"
     
@@ -113,10 +159,13 @@ class Gaviao(Animal):
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_GAVIAO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_GAVIAO
     CONSUMO_REPRODUCAO = const.ENERGIA_REPRODUCAO_GAVIAO
+    CHANCE_PREDACAO = const.CHANCE_PREDACAO_GAVIAO_COBRA
     
     def __init__(self , posicao_obj , genero=None):
         super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
         self.icone = "🦅" if self.genero == "M" else "🐦"
+        self.alvo_presa = "Cobra"
+        self.chance_predacao = self.CHANCE_PREDACAO
     
     def __str__(self) -> str:
         return super().__str__()

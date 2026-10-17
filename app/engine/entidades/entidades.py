@@ -31,7 +31,6 @@ class SerVivo(Entidade):
         
         return f"{self.horas % 24} horas | {dias % 30} dias | { meses % 12} meses| {anos} anos"
         
-        
     def envelhecer(self) -> None:
         self.horas += 3
        

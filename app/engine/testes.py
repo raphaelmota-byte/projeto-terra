@@ -32,7 +32,7 @@ for i in range(9):
     mundo.adicionar_entidade(Cobra(Posicao(cord_x , cord_y)))
     
 
-for i in range(5):
+for i in range(0):
     cord_x = random.randint(0 , tamanho_mapa_lim)
     cord_y = random.randint(0 , tamanho_mapa_lim)
     mundo.adicionar_entidade(Gaviao(Posicao(cord_x , cord_y)))

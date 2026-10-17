@@ -1,6 +1,7 @@
 from .mapa import Mapa
 from .posicao import Posicao
 from ..entidades.entidades import Entidade
+from ..entidades.animais import Animal
 
 class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
@@ -8,16 +9,16 @@ class Mundo:
         self.entidades_mundo = [] #lista com todas as entidades do mundo
         self.horas_passadas = 0
         
-    def adicionar_entidade(self , entidade:Entidade): # TODO:adicionar verificações de sucesso entre as funções.Serve para atualizar tanto a lista tanto o mapa
+    def adicionar_entidade(self , entidade:Entidade) -> None: # TODO:adicionar verificações de sucesso entre as funções.Serve para atualizar tanto a lista tanto o mapa
         self.entidades_mundo.append(entidade)
         self.mapa.adicionar_entidade(entidade) 
         
-    def remover_entidade(self , entidade:Entidade): # TODO:adicionar verificações de sucesso entre as funções.
+    def remover_entidade(self , entidade:Entidade) -> None: # TODO:adicionar verificações de sucesso entre as funções.
         if entidade in self.entidades_mundo:
             self.entidades_mundo.remove(entidade) 
             self.mapa.remover_entidade(entidade) #roda a função da class mapa 
     
-    def remover_mortos(self):
+    def remover_mortos(self) -> None:
         # Copio a lista porque remover_entidade() altera self.entidades_mundo
         # durante o loop — iterar direto pularia elementos.
         
@@ -26,7 +27,7 @@ class Mundo:
             if not entidade.estar_vivo():
                 self.remover_entidade(entidade)
                 
-    def mover_entidade_fisicamente(self , entidade:Entidade , nova_pos:Posicao):
+    def mover_entidade_fisicamente(self , entidade:Entidade , nova_pos:Posicao) -> None:
         #uso o try porque o metodo validar_posicao sobe um error quando falso
         try:
             self.mapa.validar_posicao(nova_pos)
@@ -41,7 +42,7 @@ class Mundo:
         self.mapa.adicionar_entidade(entidade)
             
         
-    def reproduzir_entidade(self , entidade:Entidade):
+    def reproduzir_entidade(self , entidade:Entidade) -> None:
         
         celula = self.mapa.obter_celula(entidade.posicao)
         vizinhos = celula.entidades
@@ -49,9 +50,17 @@ class Mundo:
         filho = entidade.reproduzir(vizinhos)#type:ignore
         if filho is not None:
             self.adicionar_entidade(filho)
+            
+    def predar(self  , entidade:Entidade):
+        celula = self.mapa.obter_celula(entidade.posicao)
+        vizinhos = celula.entidades
+        
+        if isinstance(entidade, Animal):
+            entidade.alimentar(vizinhos)
+            
                     
         
-    def atualizar(self):
+    def atualizar(self) -> None:
         self.horas_passadas += 3
         entidades = self.entidades_mundo.copy()
         
@@ -61,6 +70,7 @@ class Mundo:
             if not entidade.estar_vivo():
                 continue
             
+            self.predar(entidade)
             # 2. Atualiza o status básico (gasta energia por existir, envelhece, etc)
             entidade.atualizar()
             
@@ -79,7 +89,7 @@ class Mundo:
     def __str__(self):
         return f"o mundo possui {len(self.entidades_mundo)} entidades"
     
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return{
             "mapa" : self.mapa.to_dict() ,
             "total_entidades" : len(self.entidades_mundo),
