@@ -16,15 +16,11 @@ class Animal(SerVivo):
         self.estado = Satisfeito()
         
     def escolher_proximo_passo(self):
-        movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
-        dx , dy = random.choice(movimentos)
-        return Posicao(self.posicao.x + dx, self.posicao.y + dy)
+       return self.estado.processar_movimento(self)
         
 
     def gastar_energia(self):
-        self.energia -= self.consumo_energia
-        if self.energia <= 0:
-            self.morrer()
+        self.estado.gastar_energia(self)
     
     def alimentar(self , vizinhos):
         self.estado.processar_fome(self, vizinhos)
@@ -66,7 +62,7 @@ class Animal(SerVivo):
             
             if tem_macho_perto:
                 # Gasta a energia da mãe
-                self.energia -= self.consumo_reproducao / 2
+                self.energia -= self.consumo_reproducao 
                 
                 # type(self) vira a classe atual. Se self é Coelho, isso vira Coelho(...)
                 filhote = type(self)(Posicao(self.posicao.x, self.posicao.y)) #type:ignore
@@ -99,7 +95,12 @@ class Coelho(Animal):
     CHANCE_PREDACAO = const.CHANCE_PREDACAO_COELHO_ARVORE
     
     def __init__(self , posicao_obj , genero=None):
-        super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
+        super().__init__(
+            posicao_obj , genero=genero , 
+            energia_inicial=self.ENERGIA_INICIAL , 
+            consumo_energia=self.CONSUMO_ENERGIA , 
+            consumo_reproducao = self.CONSUMO_REPRODUCAO
+            )
         self.icone = "🐇" if self.genero == "M" else "🐰"
         self.alvo_presa = "Planta"
         self.chance_predacao = self.CHANCE_PREDACAO
@@ -147,7 +148,12 @@ class Cobra(Animal):
     CHANCE_PREDACAO = const.CHANCE_PREDACAO_COBRA_COELHO
     
     def __init__(self , posicao_obj , genero=None):
-        super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
+        super().__init__(
+            posicao_obj , genero=genero , 
+            energia_inicial=self.ENERGIA_INICIAL , 
+            consumo_energia=self.CONSUMO_ENERGIA , 
+            consumo_reproducao = self.CONSUMO_REPRODUCAO
+            )
         self.icone = "🐍" if self.genero == "M" else "🐉"
         self.alvo_presa = "Coelho"
         self.chance_predacao = self.CHANCE_PREDACAO
@@ -170,7 +176,12 @@ class Gaviao(Animal):
     CHANCE_PREDACAO = const.CHANCE_PREDACAO_GAVIAO_COBRA
     
     def __init__(self , posicao_obj , genero=None):
-        super().__init__(posicao_obj , genero=genero , energia_inicial=self.ENERGIA_INICIAL , consumo_energia=self.CONSUMO_ENERGIA , consumo_reproducao = self.CONSUMO_REPRODUCAO)
+        super().__init__(
+            posicao_obj , genero=genero , 
+            energia_inicial=self.ENERGIA_INICIAL , 
+            consumo_energia=self.CONSUMO_ENERGIA , 
+            consumo_reproducao = self.CONSUMO_REPRODUCAO
+            )
         self.icone = "🦅" if self.genero == "M" else "🐦"
         self.alvo_presa = "Cobra"
         self.chance_predacao = self.CHANCE_PREDACAO
