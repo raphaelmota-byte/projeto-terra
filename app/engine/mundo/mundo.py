@@ -6,17 +6,17 @@ from ..entidades.animais import Animal
 class Mundo:
     def __init__(self , mapa_obj:Mapa) -> None:
         self.mapa = mapa_obj # o mundo contem o mapa
-        self.entidades_mundo = [] #lista com todas as entidades do mundo
+        self.entidades_mundo = set() 
         self.horas_passadas = 0
         
-    def adicionar_entidade(self , entidade:Entidade) -> None: # TODO:adicionar verificações de sucesso entre as funções.Serve para atualizar tanto a lista tanto o mapa
-        self.entidades_mundo.append(entidade)
+    def adicionar_entidade(self , entidade:Entidade) -> None: 
+        self.entidades_mundo.add(entidade)
         self.mapa.adicionar_entidade(entidade) 
         
-    def remover_entidade(self , entidade:Entidade) -> None: # TODO:adicionar verificações de sucesso entre as funções.
+    def remover_entidade(self , entidade:Entidade) -> None: 
         if entidade in self.entidades_mundo:
             self.entidades_mundo.remove(entidade) 
-            self.mapa.remover_entidade(entidade) #roda a função da class mapa 
+            self.mapa.remover_entidade(entidade) 
     
     def remover_mortos(self) -> None:
         # Copio a lista porque remover_entidade() altera self.entidades_mundo

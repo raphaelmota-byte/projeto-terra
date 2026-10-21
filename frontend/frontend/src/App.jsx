@@ -11,6 +11,12 @@ function App() {
   const [horasMundo , setHorasMundo] = useState(0);
   const [tamMapa , setTamMapa] = useState(16);
 
+  // 1. Novos estados para a quantidade de animais
+  const [qtdCoelhos, setQtdCoelhos] = useState(11);
+  const [qtdCobras, setQtdCobras] = useState(9);
+  const[qtdGavioes , setQtdGavioes] = useState(5);
+  const[qtdArvores , setQtdArvores] = useState(9);
+
   const carregarEstado = async () => {
     try{
       const resposta = await axios.get("http://127.0.0.1:8000/estado")
@@ -26,11 +32,17 @@ function App() {
 
   const iniciarSimulacao = async () => {
     try{
-      await axios.post("http://127.0.0.1:8000/iniciar", { tamanho_mapa: tamMapa });
+      await axios.post("http://127.0.0.1:8000/iniciar", { 
+        tamanho_mapa: tamMapa ,
+        qtd_coelhos: qtdCoelhos,
+        qtd_cobras: qtdCobras ,
+        qtd_gavioes : qtdGavioes ,
+        qtd_arvores : qtdArvores 
+      });
       carregarEstado(); 
 
     }catch(error){
-      setAlerta("O mundo não pode ser iniciado, por favor confira sua conexão.");
+      setAlerta("Erro ao iniciar simulação, por favor confira sua conexão.");
     }
   };
 
@@ -46,6 +58,13 @@ function App() {
 
     }
   };
+
+  const voltarSetup = () => {
+    setMundo([]); // Isso faz a flag mundoAtivo virar false na mesma hora!
+    setTotalEntidades(0);
+    setHorasMundo(0);
+  };
+
 
   // roda toda vez que a pagina recarregar
   useEffect(() => {
@@ -73,12 +92,26 @@ function App() {
         <Controle 
           iniciarSimu={iniciarSimulacao} 
           avancarTurno={avancarTurno} 
+          voltarSetup={voltarSetup}
           quantTick={quantTick} 
           setQuantTick={setQuantTick} 
           tamMapa={tamMapa}
           setTamMapa={setTamMapa}
-        />
 
+          qtdCoelhos={qtdCoelhos}
+          setQtdCoelhos={setQtdCoelhos}
+
+          qtdCobras={qtdCobras}
+          setQtdCobras={setQtdCobras}
+
+          qtdGavioes={qtdGavioes}
+          setQtdGavioes={setQtdGavioes}
+
+          qtd_arvores={qtdArvores}
+          setQtdArvores={setQtdArvores}
+
+          mundoAtivo={mundo.length > 0}
+        />
 
         {/* funciona como um if na estrutura {variavel && (HTML)} */}
         {alerta && (<div className=" mt-3 alert alert-warning text-center fw-bold">{alerta}</div>)}

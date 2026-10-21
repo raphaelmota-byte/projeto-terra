@@ -104,7 +104,7 @@ class Coelho(Animal):
         self.alvo_presa = "Planta"
         self.chance_predacao = self.CHANCE_PREDACAO
         
-    def alimentar(self, vizinhos):
+    def executar_alimentacao(self, vizinhos):
         for vizinho in vizinhos:
             # 1. Filtro da Dieta (Garante que só come Planta)
             if vizinho.__class__.__name__ == self.alvo_presa:
@@ -120,17 +120,15 @@ class Coelho(Animal):
                 # 3. Verificação de Morte da Planta
                 if vizinho.tamanho <= 0:
                     vizinho.morrer() # A planta foi totalmente devorada e sairá do mapa
-                    print(" -> A planta foi totalmente consumida e morreu!")
+                    # print(" -> A planta foi totalmente consumida e morreu!")
                 
-                # 4. A Digestão
-                # O coelho ganha uma quantidade fixa de energia por cada mordida que dá
+                # A Digestão
                 ganho_por_mordida = const.GANHO_ENERGIA_MORDIDA 
                 self.energia = min(self.energia + ganho_por_mordida, self.ENERGIA_INICIAL)
                 
-                print(f" -> REFEIÇÃO SUCESSO! Nova energia do coelho: {self.energia}")
+                # print(f" -> REFEIÇÃO SUCESSO! Nova energia do coelho: {self.energia}")
                 
-                # 5. A Trava (1 contra 1)
-                # O coelho só morde uma planta por turno e encerra a ação
+               
                 break
         
     def __str__(self) -> str:
