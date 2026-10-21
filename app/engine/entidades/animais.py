@@ -27,7 +27,7 @@ class Animal(SerVivo):
         
     def executar_alimentacao(self , vizinhos):
         for vizinho in vizinhos:
-          if vizinho.__class__.__name__ == self.alvo_presa: #type:ignore
+          if vizinho.__class__.__name__ == self.alvo_presa and vizinho.estar_vivo(): #type:ignore
             dado = random.randint(1, 100)
             # print(f" -> Dado rolou {dado} (precisava de <= {self.chance_predacao})")
             if dado <= self.chance_predacao: #type:ignore
@@ -62,10 +62,12 @@ class Animal(SerVivo):
             
             if tem_macho_perto:
                 # Gasta a energia da mãe
-                self.energia -= self.consumo_reproducao 
+                energia_investida = self.consumo_reproducao 
+                self.energia -= energia_investida
                 
                 # type(self) vira a classe atual. Se self é Coelho, isso vira Coelho(...)
                 filhote = type(self)(Posicao(self.posicao.x, self.posicao.y)) #type:ignore
+                filhote.energia = energia_investida
                 
                 return filhote
                 
@@ -108,7 +110,7 @@ class Coelho(Animal):
     def executar_alimentacao(self, vizinhos):
         for vizinho in vizinhos:
             # 1. Filtro da Dieta (Garante que só come Planta)
-            if vizinho.__class__.__name__ == self.alvo_presa:
+            if vizinho.__class__.__name__ == self.alvo_presa and vizinho.estar_vivo():
                 
                 # LOG: Mostra o coelho achando a planta
                 # print(f"[Coelho ({self.energia} energia)] começou a comer uma Planta (Tamanho atual: {vizinho.tamanho:.1f})!")

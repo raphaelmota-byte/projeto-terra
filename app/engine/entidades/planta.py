@@ -1,5 +1,6 @@
 from .entidades import SerVivo
 from ..mundo.posicao import Posicao
+from ..config import constantes as const
 
 class Planta(SerVivo):
     def __init__(self , posicao_obj:Posicao , tamanho:float = 1.0):
@@ -9,7 +10,7 @@ class Planta(SerVivo):
     
     def crescer(self) -> None:
         if self.vivo:
-            self.tamanho = round(self.tamanho + 0.2, 1)  # round evita dízimas do float
+            self.tamanho = round(self.tamanho + const.CRESCIMENTO_ARVORE, 1)  # round evita dízimas do float
         
     
     def atualizar(self):
