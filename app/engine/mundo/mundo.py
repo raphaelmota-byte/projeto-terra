@@ -48,6 +48,7 @@ class Mundo:
         vizinhos = celula.entidades
         
         filho = entidade.reproduzir(vizinhos)#type:ignore
+       
         if filho is not None:
             self.adicionar_entidade(filho)
             

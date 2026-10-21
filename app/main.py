@@ -33,17 +33,17 @@ def iniciar_mundo(dados:IniciarMundo):
     simulacao_atual = Mundo(mapa)
     
     # Adicionando os coelhos
-    for _ in range(11):
+    for _ in range(10):
         pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
         simulacao_atual.adicionar_entidade(Coelho(pos))
 
     # Criando as Cobras 
-    for _ in range(9):
+    for _ in range(8):
         pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
         simulacao_atual.adicionar_entidade(Cobra(pos))
 
     # Criando os Gaviões
-    for _ in range(5):
+    for _ in range(7):
         pos = simulacao_atual.mapa.obter_posicao_terra_aleatoria()
         simulacao_atual.adicionar_entidade(Gaviao(pos))
     

@@ -1,4 +1,5 @@
 from .entidades import SerVivo
+from .estados import Satisfeito
 from ..mundo.posicao import Posicao
 from ..config import constantes as const
 import random
@@ -12,6 +13,7 @@ class Animal(SerVivo):
         self.consumo_energia = consumo_energia
         self.consumo_reproducao = consumo_reproducao
         self.genero = genero if genero else random.choice(["M" , "F"])
+        self.estado = Satisfeito()
         
     def escolher_proximo_passo(self):
         movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
@@ -25,6 +27,9 @@ class Animal(SerVivo):
             self.morrer()
     
     def alimentar(self , vizinhos):
+        self.estado.processar_fome(self, vizinhos)
+        
+    def executar_alimentacao(self , vizinhos):
         for vizinho in vizinhos:
           if vizinho.__class__.__name__ == self.alvo_presa: #type:ignore
             dado = random.randint(1, 100)
@@ -39,7 +44,11 @@ class Animal(SerVivo):
                 self.energia = min(self.energia + total_refeicao , self.ENERGIA_INICIAL) #type:ignore
                 
             break
+        
     def reproduzir(self, vizinhos):
+        return self.estado.processar_reproducao(self , vizinhos)
+        
+    def executar_reproducao(self , vizinhos):
         # 1. Apenas fêmeas dão à luz
         if self.genero != "F":
             return None
@@ -65,6 +74,7 @@ class Animal(SerVivo):
                 return filhote
                 
         return None
+        
     
     def atualizar(self):
         super().atualizar()
