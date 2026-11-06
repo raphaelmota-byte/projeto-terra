@@ -1,131 +1,121 @@
-# Arquitetura do Projeto Terra
+# Arquitetura do Sistema - Projeto Terra
 
-## 1. Visão geral e camadas
+Este documento detalha a arquitetura de software atualizada do **Projeto Terra**, mapeando a estrutura de classes, os padrões de projeto aplicados e o fluxo de dados entre o motor de simulação (Python) e a interface gráfica (React).
 
-O projeto está organizado em três áreas:
+## 1. Visão Geral da Arquitetura
 
-- **Core Engine (`app/engine`)**: implementa o domínio da simulação — entidades, estados, mapa, posições e avanço do mundo.
-- **API (`app/main.py`)**: expõe operações HTTP com FastAPI, cria e mantém a simulação ativa e delega sua evolução ao engine. Os modelos de entrada estão em `app/schemas.py`.
-- **Frontend (`frontend`)**: aplicação React configurada com Vite. A estrutura inclui `App.jsx` e componentes para controle, mapa e representação visual de entidades. Como o conteúdo desses arquivos não foi fornecido, o comportamento detalhado da interface e suas chamadas à API não pode ser confirmado aqui.
+O sistema é dividido em três camadas principais:
 
-O fluxo arquitetural esperado é: o frontend envia comandos à API; a API chama o engine; e o estado resultante é serializado para ser retornado ao frontend.
+1. **Engine (Motor da Simulação):** Escrito em Python puro, focado em alta performance e regras determinísticas. Utiliza Orientação a Objetos avançada para simular biologia, física e comportamento emergente.
+2. **API (FastAPI):** Camada de comunicação RESTful que expõe o estado da *Engine* para o mundo externo, lidando com a serialização e roteamento.
+3. **Front-end (React + Bootstrap):** Interface interativa que consome o estado gerado pela API para renderizar o grid espacial e controlar o fluxo do tempo.
 
-## 2. Core Engine: entidades e otimização de memória
+---
 
-### 2.1 Hierarquia de classes
+## 2. Hierarquia de Entidades (Biologia e O.O.)
 
-```text
-Entidade
-└── SerVivo
-    ├── Animal
-    │   ├── Coelho
-    │   ├── Cobra
-    │   └── Gaviao
-    └── Planta
+A árvore biológica do projeto garante que atributos comuns sejam herdados, eliminando repetição de código (DRY) e garantindo baixo custo de memória através do uso de `__slots__`.
+
+* **`Entidade` (Classe Base)**
+  * **Propósito:** Representa qualquer objeto que ocupe espaço no mapa.
+  * **Atributos (`__slots__`):** `posicao`
+  * **Métodos:** Delega a conversão básica para `to_dict()`.
+
+* **`SerVivo` (Herda de `Entidade`)**
+  * **Propósito:** Adiciona o conceito de ciclo de vida e tempo estrutural.
+  * **Atributos (`__slots__`):** `vivo` (boolean), `horas` (idade).
+  * **Métodos:** Controle de envelhecimento e método de serialização dinâmica (`__class__.__name__`).
+
+* **`Animal` (Herda de `SerVivo`)**
+  * **Propósito:** A base comum para qualquer agente que se move, consome energia e possui inteligência.
+  * **Atributos (`__slots__`):** `energia`, `consumo_energia`, `consumo_reproducao`, `genero`, `estado`, `chance_predacao`, `alvo_presa`.
+  * **Métodos:** `atualizar()`, `alimentar(vizinhos)`, genérica de predação (cálculo de nutrição híbrida = valor base + % gordura).
+
+* **Classes Concretas (Especializações):**
+  * **`Coelho`, `Cobra`, `Gaviao`:** Injetam as configurações biológicas do ecossistema e sobrescrevem regras (como a herbivoria de 100% de sucesso no Coelho).
+  * **`Planta` (Herda de `SerVivo`):** Vegetação autônoma que possui atributo de `tamanho`.
+
+---
+
+## 3. Comportamento Autônomo (Padrão State)
+
+A tomada de decisão dos animais foi isolada utilizando o **Design Pattern State** (arquivo `estados.py`). Isso remove "Ifs" gigantescos da classe `Animal` e delega a cognição para o estado atual.
+
+* **Interface/Contrato:** `EstadoAnimal` (Classe Abstrata definindo `processar_fome`, `processar_movimento`, `processar_reproducao`, `gastar_energia`).
+* **Estados Concretos:**
+  1. **`Satisfeito`:** Explora aleatoriamente, busca reprodução.
+  2. **`Faminto`:** Cancela outras ações; foca em caçar ativamente (usando o radar de vizinhos).
+  3. **`Descansando`:** Trava a posição e reduz o consumo de energia (`REDUCAO_ENERGIA_ESTADO_DESCANSO`) para sobrevivência.
+
+---
+
+## 4. O Espaço e o Tempo (Motor e Grid)
+
+A física e a passagem de tempo são controladas pela tríade geográfica da simulação:
+
+* **`Posicao`:** Utilitário matemático para coordenadas `x` e `y`.
+* **`Celula`:** Contêiner geográfico. Guarda o `tipo` de terreno ("terra", "agua") e a lista de instâncias de `Entidade` sobrepostas ali. Bloqueia a entrada de animais na água.
+* **`Mapa`:** Matriz bidimensional (2D) de `Celula`. Responsável por instanciar a grade e validar indexações (bordas).
+* **`Mundo` (A Engine):** 
+  * Possui composição com o `Mapa` e guarda a lista global `entidades_mundo`.
+  * **`atualizar()`:** O *Game Loop*. Ocorre 1x a cada Tick (3 horas no mundo biológico). Itera a lista, chama os estados, resolve interações espaciais, e aciona o "Garbage Collector" interno (`remover_mortos()`).
+
+---
+
+## 5. Fluxo de Dados em Cascata (Serialização)
+
+Para enviar os dados ao React, o sistema utiliza uma serialização delegada (em cascata), isolando responsabilidades:
+
+1. A API pede os dados ao `Mundo`.
+2. O `Mundo.to_dict()` chama o `to_dict()` do `Mapa`.
+3. O `Mapa.to_dict()` itera o grid 2D e chama o `to_dict()` de cada `Celula`.
+4. A `Celula.to_dict()` extrai o terreno e aciona o `to_dict()` de cada entidade contida nela, empacotando tudo em um dicionário.
+5. O FastAPI converte esse super dicionário em JSON e entrega na rota GET `/estado`.
+
+---
+
+## 6. Diagrama UML de Classes
+
+```mermaid
+classDiagram
+    %% Relações de Herança
+    Entidade <|-- SerVivo
+    SerVivo <|-- Animal
+    SerVivo <|-- Planta
+    Animal <|-- Coelho
+    Animal <|-- Cobra
+    Animal <|-- Gaviao
+
+    %% Padrão State
+    Animal "1" *-- "1" EstadoAnimal : Controlado por
+    EstadoAnimal <|.. Satisfeito
+    EstadoAnimal <|.. Faminto
+    EstadoAnimal <|.. Descansando
+
+    %% Motor e Espaço Geográfico
+    Mundo "1" *-- "1" Mapa : Contém
+    Mapa "1" *-- "many" Celula : Matriz 2D
+    Celula "1" o-- "many" Entidade : Agrega
+    Entidade "1" *-- "1" Posicao : Ocupa
+
+    class Mundo {
+        +atualizar()
+        +predar(Entidade e)
+        +to_dict() dict
+    }
+
+    class EstadoAnimal {
+        <<abstract>>
+        +processar_movimento(Animal a, vizinhos)
+        +processar_fome(Animal a, vizinhos)
+        +processar_reproducao(Animal a, vizinhos)
+        +gastar_energia(Animal a)
+    }
+
+    class Animal {
+        +energia: float
+        +alvo_presa: str
+        +alimentar(vizinhos)
+        +atualizar()
+    }
 ```
-
-- **`Entidade`** define posição e nome.
-- **`SerVivo`** acrescenta idade em horas, condição de vida, envelhecimento e operações comuns aos seres vivos.
-- **`Animal`** adiciona energia, consumo, gênero e estado comportamental. Coelho, Cobra e Gaviao especializam parâmetros, presa, percepção e ícone.
-- **`Planta`** acrescenta tamanho e crescimento.
-
-### 2.2 `__slots__`
-
-As classes da hierarquia declaram `__slots__` para enumerar seus atributos de instância. Como as subclasses também declaram seus próprios slots, essa hierarquia evita, em geral, a criação de um `__dict__` para cada instância e pode reduzir o consumo de memória quando há muitas entidades.
-
-O benefício se aplica à hierarquia de entidades mostrada; outras classes, como `Posicao` e `Celula`, não declaram `__slots__`.
-
-### 2.3 Serialização em cascata
-
-Os métodos `to_dict()` compõem os dados de cada classe por herança:
-
-1. `Entidade.to_dict()` serializa posição e nome.
-2. `SerVivo.to_dict()` acrescenta condição de vida e idade.
-3. `Animal.to_dict()` acrescenta energia, consumos, gênero e percepção.
-4. As classes concretas de animais acrescentam o ícone.
-5. `Planta.to_dict()` acrescenta o tamanho.
-6. `Celula.to_dict()` serializa suas entidades; `Mapa.to_dict()` serializa as células; `Mundo.to_dict()` inclui o mapa, o total de entidades e as horas passadas.
-
-A posição possui seu próprio `to_dict()`, que retorna as coordenadas `x` e `y`. A planta define um ícone, mas seu `to_dict()` atual não o inclui.
-
-## 3. Padrão State: estados dos animais
-
-`EstadoAnimal` é uma classe abstrata que define o contrato comportamental:
-
-- `processar_fome(animal, vizinhos)`
-- `processar_reproducao(animal, vizinhos)`
-- `processar_movimento(animal, radar)`
-- `gastar_energia(animal)`
-
-Os estados concretos são `Satisfeito`, `Cacando` e `Descansando`. `Cacando` é o nome usado atualmente no código, no lugar de `Faminto`.
-
-| Estado | Fome/alimentação | Reprodução | Movimento | Energia |
-|---|---|---|---|---|
-| `Satisfeito` | Muda para `Cacando` quando a energia fica abaixo ou igual ao limiar `ENTRAR_ESTADO_CACANDO`; muda para `Descansando` quando fica acima ou igual a `ENTRAR_ESTADO_DESCANSO`. | Delega a `Animal.executar_reproducao()`. | Usa a implementação-base, que escolhe um movimento cardinal aleatório. | Consumo normal. |
-| `Cacando` | Executa a alimentação e muda para `Satisfeito` ao atingir o limiar `ENTRAR_ESTADO_SATISFEITO`. | Não reproduz. | Usa a implementação-base. | Consumo normal. |
-| `Descansando` | Muda para `Satisfeito` quando a energia fica abaixo do limiar `ENTRAR_ESTADO_SATISFEITO`. | Delega a `Animal.executar_reproducao()`. | Permanece na posição atual. | Consumo reduzido por `REDUCAO_ENERGIA_ESTADO_DESCANSO`. |
-
-Os limiares são definidos em `app/engine/config/constantes.py`; seus valores não estão incluídos neste material. A classe `Animal` delega ao estado atual as operações de fome/alimentação, reprodução, movimento e gasto de energia.
-
-## 4. Motor espacial e percepção
-
-O mapa é uma matriz de células: `y` seleciona a linha e `x` a coluna. Cada célula contém terreno e lista de entidades.
-
-`Mundo.calcular_radar()` usa o atributo `percepcao` da entidade como raio. Calcula os limites de cada eixo e os restringe às dimensões do mapa:
-
-```text
-inicio_x = max(0, x - raio)
-fim_x    = min(largura, x + raio + 1)
-
-inicio_y = max(0, y - raio)
-fim_y    = min(comprimento, y + raio + 1)
-```
-
-Os intervalos são percorridos com `range`, cujo limite final não é incluído; por isso, o `+ 1` contempla a coordenada extrema do raio. As travas `max` e `min` mantêm a consulta dentro da matriz e evitam índices fora dos limites, que causariam `IndexError`.
-
-O radar percorre uma área quadrada em torno da entidade e agrega as outras entidades encontradas nas células. Entidades sem `percepcao` recebem uma lista vazia. Embora o radar seja passado ao método de movimento, a implementação-base atual escolhe uma direção cardinal aleatória e não consulta o conteúdo do radar.
-
-## 5. Ciclo de atualização do mundo
-
-Um tick equivale a **3 horas simuladas**. `Mundo.atualizar()` executa as seguintes etapas:
-
-1. Avança `horas_passadas` em 3.
-2. Cria uma cópia do conjunto de entidades para iterar enquanto o mundo pode mudar.
-3. Ignora entidades já mortas.
-4. Executa a predação/alimentação na célula atual.
-5. Atualiza a entidade: seres vivos envelhecem 3 horas; animais também gastam energia, e plantas crescem.
-6. Se a entidade continua viva, tenta reproduzi-la. O filhote, quando produzido, é adicionado ao mundo.
-7. Se a entidade oferece `escolher_proximo_passo`, calcula o radar, escolhe uma posição e tenta movê-la. A movimentação rejeita posições fora do mapa e células de água.
-8. Remove do mundo e do mapa as entidades mortas.
-
-A ordem de iteração é a do conjunto `entidades_mundo`, não uma sequência explicitamente ordenada. Isso é relevante para interações entre entidades no mesmo tick.
-
-### Determinismo
-
-O ciclo é discreto, mas **não é totalmente determinístico na implementação atual**. Há fontes de aleatoriedade, incluindo geração de água, posições iniciais, gênero, movimento e probabilidade de predação. Além disso, a iteração sobre um conjunto não define uma ordem de atualização estável. O código da geração de água também contém um comentário indicando a ausência de uma seed fixa.
-
-Para tornar execuções reproduzíveis, seria necessário controlar a aleatoriedade com uma seed e definir uma ordem explícita para processar as entidades.
-
-## 6. API FastAPI
-
-`app/main.py` disponibiliza três rotas:
-
-- **`POST /iniciar`**: cria um mapa quadrado, instancia um novo `Mundo` e distribui coelhos, cobras, gaviões e árvores em posições de terra aleatórias. Os valores padrão do modelo `IniciarMundo` são mapa 16×16, 11 coelhos, 9 cobras, 5 gaviões e 10 árvores.
-- **`POST /tick`**: recebe a quantidade de ticks e chama `Mundo.atualizar()` essa quantidade de vezes. Retorna mensagem e tempo de processamento em milissegundos. Se o mundo não foi iniciado, retorna HTTP 404.
-- **`GET /estado`**: retorna a serialização do mundo atual. Se não há simulação ativa, retorna HTTP 404.
-
-A instância da simulação é mantida na variável global `simulacao_atual`. Portanto, o estado é compartilhado no processo do servidor, e iniciar outro mundo substitui a simulação anterior. Os schemas de entrada são definidos em `app/schemas.py`: `IniciarMundo` e `AvancaTick`.
-
-A API configura CORS para aceitar qualquer origem, método e cabeçalho; essa configuração deve ser revista antes de um uso exposto em produção.
-
-## 7. Frontend React
-
-A estrutura fornecida indica uma aplicação React com Vite:
-
-- `src/App.jsx`: componente principal da aplicação.
-- `src/componentes/Controle.jsx`: componente de controle, conforme sua organização e nome.
-- `src/componentes/Mapa.jsx`: componente de apresentação do mapa.
-- `src/componentes/IconeEntidade.jsx`: componente associado à representação de entidades.
-- `src/index.css` e `src/componentes/style/`: estilos globais e estilos dos componentes.
-
-Sem o conteúdo dos arquivos do frontend, não é possível documentar com segurança os detalhes do estado React, das requisições HTTP, do formato efetivamente consumido ou das interações da interface.
