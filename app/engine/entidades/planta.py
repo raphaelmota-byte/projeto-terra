@@ -3,6 +3,7 @@ from ..mundo.posicao import Posicao
 from ..config import constantes as const
 
 class Planta(SerVivo):
+    __slots__ = ['tamanho' , 'icone']
     def __init__(self , posicao_obj:Posicao , tamanho:float = 1.0):
         super().__init__(posicao_obj)
         self.tamanho = tamanho

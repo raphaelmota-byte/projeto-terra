@@ -7,6 +7,7 @@ from app.engine.mundo.mundo import Mundo
 from app.engine.mundo.mapa import Mapa
 from app.schemas import AvancaTick , IniciarMundo
 import random
+import time
 
 app = FastAPI()
 
@@ -62,11 +63,27 @@ def atualizar_mundo(dados: AvancaTick):
                     status_code=404 , 
                     detail= "Inicie o mundo primeiro chamando a rota /iniciar"
                     )
-        
+    
+    # 2. Marca o tempo exato antes de começar o loop dos ticks
+    tempo_inicio = time.perf_counter()
+    
     for _ in range(dados.tick):
         simulacao_atual.atualizar()
         
-    return {"mensagem": f"Mundo atualizado em {dados.tick} ticks com sucesso"}
+    # 3. Marca o tempo logo após terminar
+    tempo_fim = time.perf_counter()
+    
+    # 4. Calcula a diferença e converte para milissegundos (ms)
+    tempo_total_ms = (tempo_fim - tempo_inicio) * 1000
+    
+    # 5. Mostra o resultado direto no terminal do Uvicorn para você brincar
+    # print(f"{dados.tick} tick(s) processados em: {tempo_total_ms:.2f} ms")
+    
+    return {
+        "mensagem": f"{dados.tick} turnos(s) avançados com sucesso",
+        "tempo_processamento_ms": round(tempo_total_ms, 2)
+    }
+
 
 @app.get("/estado")
 def obter_estado():

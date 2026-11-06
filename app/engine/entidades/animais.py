@@ -5,6 +5,7 @@ from ..config import constantes as const
 import random
  
 class Animal(SerVivo):
+    __slots__ = ['energia', 'consumo_energia', 'consumo_reproducao', 'genero', 'estado']
     PERCEPCAO = 0
     
     def __init__(self, posicao_obj:Posicao , energia_inicial , consumo_energia , consumo_reproducao, genero=None ):
@@ -15,8 +16,8 @@ class Animal(SerVivo):
         self.genero = genero if genero else random.choice(["M" , "F"])
         self.estado = Satisfeito()
         
-    def escolher_proximo_passo(self):
-       return self.estado.processar_movimento(self)
+    def escolher_proximo_passo(self , radar:list[Entidade|[]]): # type: ignore
+       return self.estado.processar_movimento(self , radar)
         
 
     def gastar_energia(self):
@@ -31,13 +32,17 @@ class Animal(SerVivo):
             dado = random.randint(1, 100)
             # print(f" -> Dado rolou {dado} (precisava de <= {self.chance_predacao})")
             if dado <= self.chance_predacao: #type:ignore
-                vizinho.morrer()  # A presa tem o status vivo=False e será limpa pelo motor
+                vizinho.morrer() 
+                # print(f"energia do {self.nome} antes de comer a(o) {vizinho.nome}: {self.energia}") 
+                # print(f"{vizinho.nome} foi morto pelo(a) {self.nome}")
                 
                 valor_base = vizinho.ENERGIA_INICIAL 
+                    
                 bonus_gordura = vizinho.energia * const.BONUS_GORDURA 
                 total_refeicao = valor_base + bonus_gordura
                 
                 self.energia = min(self.energia + total_refeicao , self.ENERGIA_INICIAL) #type:ignore
+                # print(f"{self.nome} tem {self.energia} agora")
                 
             break
         
@@ -84,12 +89,15 @@ class Animal(SerVivo):
             "energia" : self.energia ,
             "consumo_energia" : self.consumo_energia ,
             "consumo_reproducao" :  self.consumo_reproducao ,
-            "genero" : self.genero
+            "genero" : self.genero ,
+            "percepcao" : self.PERCEPCAO
         })
         return dados
 
 
 class Coelho(Animal):
+    __slots__ = ['icone', 'alvo_presa', 'chance_predacao', 'percepcao']
+    
     PERCEPCAO = const.PERCEPCAO_COELHO
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COELHO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COELHO
@@ -106,32 +114,26 @@ class Coelho(Animal):
         self.icone = "🐇" if self.genero == "M" else "🐰"
         self.alvo_presa = "Planta"
         self.chance_predacao = self.CHANCE_PREDACAO
+        self.percepcao = self.PERCEPCAO
         
     def executar_alimentacao(self, vizinhos):
         for vizinho in vizinhos:
-            # 1. Filtro da Dieta (Garante que só come Planta)
+            # Filtro da Dieta (Garante que só come Planta)
             if vizinho.__class__.__name__ == self.alvo_presa and vizinho.estar_vivo():
                 
-                # LOG: Mostra o coelho achando a planta
-                # print(f"[Coelho ({self.energia} energia)] começou a comer uma Planta (Tamanho atual: {vizinho.tamanho:.1f})!")
                 
-                # 2. O Consumo (Sem probabilidade de erro)
                 # O coelho tira uma "mordida" fixa do tamanho da planta
                 mordida = const.MORDIDA_COELHO 
                 vizinho.tamanho -= mordida
                 
-                # 3. Verificação de Morte da Planta
+                # Verificação de Morte da Planta
                 if vizinho.tamanho <= 0:
                     vizinho.morrer() # A planta foi totalmente devorada e sairá do mapa
-                    # print(" -> A planta foi totalmente consumida e morreu!")
                 
                 # A Digestão
                 ganho_por_mordida = const.GANHO_ENERGIA_MORDIDA 
                 self.energia = min(self.energia + ganho_por_mordida, self.ENERGIA_INICIAL)
                 
-                # print(f" -> REFEIÇÃO SUCESSO! Nova energia do coelho: {self.energia}")
-                
-               
                 break
         
     def __str__(self) -> str:
@@ -143,6 +145,8 @@ class Coelho(Animal):
         return dados
     
 class Cobra(Animal):
+    __slots__ = ['icone', 'alvo_presa', 'chance_predacao', 'percepcao']
+    
     PERCEPCAO = const.PERCEPCAO_COBRA
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_COBRA
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_COBRA
@@ -159,6 +163,7 @@ class Cobra(Animal):
         self.icone = "🐍" if self.genero == "M" else "🐉"
         self.alvo_presa = "Coelho"
         self.chance_predacao = self.CHANCE_PREDACAO
+        self.percepcao = self.PERCEPCAO
     
     
     def __str__(self) -> str:
@@ -171,6 +176,8 @@ class Cobra(Animal):
         
         
 class Gaviao(Animal):
+    __slots__ = ['icone', 'alvo_presa', 'chance_predacao', 'percepcao']
+    
     PERCEPCAO = const.PERCEPCAO_GAVIAO
     ENERGIA_INICIAL = const.ENERGIA_INICIAL_GAVIAO
     CONSUMO_ENERGIA = const.CONSUMO_ENERGIA_GAVIAO
@@ -187,6 +194,7 @@ class Gaviao(Animal):
         self.icone = "🦅" if self.genero == "M" else "🐦"
         self.alvo_presa = "Cobra"
         self.chance_predacao = self.CHANCE_PREDACAO
+        self.percepcao = self.PERCEPCAO
     
     def __str__(self) -> str:
         return super().__str__()

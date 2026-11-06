@@ -15,8 +15,10 @@ class EstadoAnimal(ABC):
         pass
     
     @abstractmethod
-    def processar_movimento(self , animal):
-        pass
+    def processar_movimento(self , animal , radar):
+        movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
+        dx , dy = random.choice(movimentos)
+        return Posicao(animal.posicao.x + dx, animal.posicao.y + dy)
     
     @abstractmethod
     def gastar_energia(self , animal):
@@ -26,9 +28,8 @@ class EstadoAnimal(ABC):
 
 class Satisfeito(EstadoAnimal):
     def processar_fome(self , animal , vizinhos):
-        if animal.energia <= (animal.ENERGIA_INICIAL * const.ENTRAR_ESTADO_FAMINTO):
-            # print(f"{animal.__class__.__name__} tem {animal.energia} de energia e ficou com fome!")
-            animal.estado = Faminto()
+        if animal.energia <= (animal.ENERGIA_INICIAL * const.ENTRAR_ESTADO_CACANDO):
+            animal.estado = Cacando()
         elif animal.energia >= (animal.ENERGIA_INICIAL * const.ENTRAR_ESTADO_DESCANSO):
             animal.estado = Descansando()
         return None
@@ -37,33 +38,29 @@ class Satisfeito(EstadoAnimal):
         filhote = animal.executar_reproducao(vizinhos)
         return filhote
     
-    def processar_movimento(self, animal):
-        movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
-        dx , dy = random.choice(movimentos)
-        return Posicao(animal.posicao.x + dx, animal.posicao.y + dy)
+    def processar_movimento(self, animal , radar):
+        return super().processar_movimento(animal , radar)
     
     def gastar_energia(self, animal):
         return super().gastar_energia(animal)
     
-class Faminto(EstadoAnimal):
+class Cacando(EstadoAnimal):
     def processar_fome(self, animal, vizinhos):
         animal.executar_alimentacao(vizinhos)
         
         if animal.energia >= (animal.ENERGIA_INICIAL * const.ENTRAR_ESTADO_SATISFEITO):
-            # print(f"{animal.__class__.__name__} tem {animal.energia} de energia ficou cheio/satisfeito!")
             animal.estado = Satisfeito()
     
     
     def processar_reproducao(self, animal, vizinhos):
         return None
     
-    def processar_movimento(self, animal):
-           movimentos = [(0,1) , (0,-1)  , (1,0)  , (-1,0)]
-           dx , dy = random.choice(movimentos)
-           return Posicao(animal.posicao.x + dx, animal.posicao.y + dy)
+    def processar_movimento(self, animal , radar):
+        return super().processar_movimento(animal , radar)
        
     def gastar_energia(self, animal):
             return super().gastar_energia(animal)
+       
        
        
 class Descansando(EstadoAnimal):
@@ -75,7 +72,7 @@ class Descansando(EstadoAnimal):
         filhote = animal.executar_reproducao(vizinhos)
         return filhote
     
-    def processar_movimento(self, animal):
+    def processar_movimento(self, animal , radar):
         
         return Posicao(animal.posicao.x , animal.posicao.y)
     

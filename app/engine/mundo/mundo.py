@@ -27,6 +27,35 @@ class Mundo:
             if not entidade.estar_vivo():
                 self.remover_entidade(entidade)
                 
+    def calcular_radar(self , entidade:Entidade):
+        radar = []
+        if not hasattr(entidade, 'percepcao'):
+            return radar
+        
+        raio = entidade.percepcao  # type: ignore
+        x_atual = entidade.posicao.x
+        y_atual = entidade.posicao.y
+        
+        inicio_x = max(0, x_atual - raio)
+        fim_x = min(self.mapa.largura, x_atual + raio + 1)
+
+        inicio_y = max(0, y_atual - raio)
+        fim_y = min(self.mapa.comprimento, y_atual + raio + 1)
+        
+        for distancia_x in range(inicio_x , fim_x):
+            for distancia_y in range(inicio_y , fim_y):
+                
+                pos_celula_vizinha = Posicao(distancia_x , distancia_y)
+                celula = self.mapa.obter_celula(pos_celula_vizinha)
+                
+                for vizinho in celula.entidades:
+                    if vizinho != entidade:
+                        radar.append(vizinho)
+                    
+                    
+                    
+        return radar
+                
     def mover_entidade_fisicamente(self , entidade:Entidade , nova_pos:Posicao) -> None:
         #uso o try porque o metodo validar_posicao sobe um error quando falso
         try:
@@ -54,11 +83,12 @@ class Mundo:
             
     def predar(self  , entidade:Entidade):
         celula = self.mapa.obter_celula(entidade.posicao)
-        vizinhos = celula.entidades
+        presas = celula.entidades
         
         if isinstance(entidade, Animal):
-            entidade.alimentar(vizinhos)
+            entidade.alimentar(presas)
             
+       
                     
         
     def atualizar(self) -> None:
@@ -71,6 +101,7 @@ class Mundo:
             if not entidade.estar_vivo():
                 continue
             
+            
             self.predar(entidade)
             # 2. Atualiza o status básico (gasta energia por existir, envelhece, etc)
             entidade.atualizar()
@@ -82,7 +113,9 @@ class Mundo:
                 self.reproduzir_entidade(entidade)
             
             if hasattr(entidade , "escolher_proximo_passo"): 
-                nova_pos = entidade.escolher_proximo_passo()
+                visao_radar = self.calcular_radar(entidade)
+                
+                nova_pos = entidade.escolher_proximo_passo(visao_radar)
                 self.mover_entidade_fisicamente(entidade , nova_pos)
                 
         self.remover_mortos()

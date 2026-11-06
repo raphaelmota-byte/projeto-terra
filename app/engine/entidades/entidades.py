@@ -3,9 +3,11 @@ from ..config import constantes as const
 from typing import Any
 
 class Entidade:
+    __slots__ = ['posicao' , 'nome']
+    
     def __init__(self , posicao_obj:Posicao ):
         self.posicao = posicao_obj
-        self.nome = self.__class__.__name__,
+        self.nome = self.__class__.__name__
     
     def to_dict(self):
         return {
@@ -14,11 +16,12 @@ class Entidade:
             }
     
     def __repr__(self):
-        return f"{self.__class__.__name__}(posicao=({self.posicao.x},{self.posicao.y})"
+        return f"{self.nome}(posicao=({self.posicao.x},{self.posicao.y})"
        
         
 
 class SerVivo(Entidade):
+    __slots__ = ['horas' , 'vivo']
     def __init__(self , posicao_obj:Posicao):
         super().__init__(posicao_obj)
         self.horas:int = 0

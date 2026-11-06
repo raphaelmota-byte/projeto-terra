@@ -18,7 +18,7 @@ export const IconeEntidade = ({ entidades }) => {
 
   try {
     const ultimaEntidade = entidades[entidades.length - 1];
-    const nomeAnimal = ultimaEntidade?.nome_entidade?.[0]?.toLowerCase();
+    const nomeAnimal = ultimaEntidade?.nome_entidade?.toLowerCase();
     const genero = ultimaEntidade?.genero;
 
     if (!nomeAnimal) return null;
