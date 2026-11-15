@@ -90,7 +90,8 @@ class Animal(SerVivo):
             "consumo_energia" : self.consumo_energia ,
             "consumo_reproducao" :  self.consumo_reproducao ,
             "genero" : self.genero ,
-            "percepcao" : self.PERCEPCAO
+            "percepcao" : self.PERCEPCAO ,
+            "estado" : self.estado.__class__.__name__
         })
         return dados
 
