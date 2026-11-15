@@ -23,18 +23,18 @@ class Animal(SerVivo):
     def gastar_energia(self):
         self.estado.gastar_energia(self)
     
-    def alimentar(self , vizinhos):
-        self.estado.processar_fome(self, vizinhos)
+    def alimentar(self , vizinhos:list) -> str|None:
+        return self.estado.processar_fome(self, vizinhos)
         
-    def executar_alimentacao(self , vizinhos):
+    def executar_alimentacao(self , vizinhos:list) -> str | None:
         for vizinho in vizinhos:
           if vizinho.__class__.__name__ == self.alvo_presa and vizinho.estar_vivo(): #type:ignore
             dado = random.randint(1, 100)
-            # print(f" -> Dado rolou {dado} (precisava de <= {self.chance_predacao})")
+            info_predador_str = f"{self.nome} {self.posicao}"
+            info_presa_str = f"{vizinho.nome} {vizinho.posicao}"
+            
             if dado <= self.chance_predacao: #type:ignore
                 vizinho.morrer() 
-                # print(f"energia do {self.nome} antes de comer a(o) {vizinho.nome}: {self.energia}") 
-                # print(f"{vizinho.nome} foi morto pelo(a) {self.nome}")
                 
                 valor_base = vizinho.ENERGIA_INICIAL 
                     
@@ -42,11 +42,13 @@ class Animal(SerVivo):
                 total_refeicao = valor_base + bonus_gordura
                 
                 self.energia = min(self.energia + total_refeicao , self.ENERGIA_INICIAL) #type:ignore
-                # print(f"{self.nome} tem {self.energia} agora")
-                
-            break
+                return f"{info_predador_str} predou {info_presa_str}"
+            else:
+                return f"{info_predador_str} tentou mas não predou o {info_presa_str}"
         
-    def reproduzir(self, vizinhos):
+        return None
+        
+    def reproduzir(self, vizinhos:list):
         return self.estado.processar_reproducao(self , vizinhos)
         
     def executar_reproducao(self , vizinhos):
@@ -117,7 +119,7 @@ class Coelho(Animal):
         self.chance_predacao = self.CHANCE_PREDACAO
         self.percepcao = self.PERCEPCAO
         
-    def executar_alimentacao(self, vizinhos):
+    def executar_alimentacao(self, vizinhos:list) -> str | None:
         for vizinho in vizinhos:
             # Filtro da Dieta (Garante que só come Planta)
             if vizinho.__class__.__name__ == self.alvo_presa and vizinho.estar_vivo():
@@ -127,15 +129,19 @@ class Coelho(Animal):
                 mordida = const.MORDIDA_COELHO 
                 vizinho.tamanho -= mordida
                 
-                # Verificação de Morte da Planta
-                if vizinho.tamanho <= 0:
-                    vizinho.morrer() # A planta foi totalmente devorada e sairá do mapa
-                
                 # A Digestão
                 ganho_por_mordida = const.GANHO_ENERGIA_MORDIDA 
                 self.energia = min(self.energia + ganho_por_mordida, self.ENERGIA_INICIAL)
                 
-                break
+                pos_str = f"({self.posicao})"
+                
+                if vizinho.tamanho <= 0:
+                    vizinho.morrer()
+                    return f"Coelho {pos_str} devorou uma Planta por completo"
+
+                return f"Coelho {pos_str} comeu parte de uma Planta"
+                
+        return None
         
     def __str__(self) -> str:
         return f"{super().__str__()}"

@@ -4,6 +4,7 @@ import cobra_icone from '../assets/cobra_icone.svg'
 import gaviao_icone from '../assets/gaviao_icone.svg'
 import arvore_icone from '../assets/arvore_icone.svg'
 
+//dicionario que vincula a imagem ao animal
 const mapaDeIcones = {
   coelho: coelho_icone,
   cobra: cobra_icone,

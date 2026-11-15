@@ -1,7 +1,8 @@
-import { useState , useEffect, useRef} from 'react'
+import { useState , useEffect} from 'react'
 import axios from 'axios';
 import {Controle } from './componentes/Controle'
 import {Mapa} from './componentes/Mapa'
+import { LogMundo } from './componentes/logMundo';
 
 function App() {
   const [mundo , setMundo] = useState([]);
@@ -9,23 +10,29 @@ function App() {
   const [alerta , setAlerta] = useState(null);
   const [quantTick, setQuantTick] = useState(1);
   const [horasMundo , setHorasMundo] = useState(0);
+  
+  // tamanho mapa padrao
   const [tamMapa , setTamMapa] = useState(16);
 
-  // 1. Novos estados para a quantidade de animais
+  // quantidade de animais padrao
   const [qtdCoelhos, setQtdCoelhos] = useState(11);
   const [qtdCobras, setQtdCobras] = useState(9);
   const[qtdGavioes , setQtdGavioes] = useState(5);
   const[qtdArvores , setQtdArvores] = useState(9);
+
+  const[logs , setLogs] = useState([]);
 
   const carregarEstado = async () => {
     try{
       const resposta = await axios.get("http://127.0.0.1:8000/estado")
       setMundo(resposta.data.mapa);
       setTotalEntidades(resposta.data.total_entidades);
-      setHorasMundo(resposta.data.horas_passadas)
+      setHorasMundo(resposta.data.horas_passadas) ;
+      setLogs(resposta.data.logs || []) ;
       setAlerta(null)
     }
     catch(erro){
+      console.error("Falha ao carregar estado:", erro);
       setAlerta("O mundo ainda não foi carregador, por favor confira sua conexão ou clique em iniciar.");
     }
   };
@@ -42,6 +49,7 @@ function App() {
       carregarEstado(); 
 
     }catch(error){
+      console.error("Falha ao carregar estado:", error);
       setAlerta("Erro ao iniciar simulação, por favor confira sua conexão.");
     }
   };
@@ -63,12 +71,28 @@ function App() {
     setMundo([]); // Isso faz a flag mundoAtivo virar false na mesma hora!
     setTotalEntidades(0);
     setHorasMundo(0);
+    setLogs([]) ;
   };
 
 
   // roda toda vez que a pagina recarregar
   useEffect(() => {
-    carregarEstado();
+    const carregarEstadoInicial = async () => {
+      try {
+        const resposta = await axios.get("http://127.0.0.1:8000/estado");
+        setMundo(resposta.data.mapa);
+        setTotalEntidades(resposta.data.total_entidades);
+        setHorasMundo(resposta.data.horas_passadas);
+        setLogs(resposta.data.logs || []);
+        setAlerta(null);
+      } catch (erro) {
+        console.error("Falha ao carregar estado inicial:", erro);
+        setAlerta("O mundo ainda não foi carregado, por favor confira sua conexão ou clique em iniciar.");
+        setLogs([]);
+      }
+    };
+
+    carregarEstadoInicial();
   }, []);
 
   const dias = Math.floor(horasMundo / 24);
@@ -107,14 +131,17 @@ function App() {
           qtdGavioes={qtdGavioes}
           setQtdGavioes={setQtdGavioes}
 
-          qtd_arvores={qtdArvores}
+          qtdArvores={qtdArvores}
           setQtdArvores={setQtdArvores}
 
           mundoAtivo={mundo.length > 0}
         />
 
-        {/* funciona como um if na estrutura {variavel && (HTML)} */}
-        {alerta && (<div className=" mt-3 alert alert-warning text-center fw-bold">{alerta}</div>)}
+        {mundo.length > 0 && <LogMundo logs={logs} />}
+
+        {alerta && (
+          <div className="mt-3 alert alert-warning text-center fw-bold">{alerta}</div> //
+        )}
 
       </div>
     </>

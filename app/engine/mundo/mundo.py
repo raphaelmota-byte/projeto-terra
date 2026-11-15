@@ -1,3 +1,4 @@
+from collections import deque
 from .mapa import Mapa
 from .posicao import Posicao
 from ..entidades.entidades import Entidade
@@ -8,6 +9,7 @@ class Mundo:
         self.mapa = mapa_obj # o mundo contem o mapa
         self.entidades_mundo = set() 
         self.horas_passadas = 0
+        self.logs = deque(maxlen=50)
         
     def adicionar_entidade(self , entidade:Entidade) -> None: 
         self.entidades_mundo.add(entidade)
@@ -80,13 +82,18 @@ class Mundo:
        
         if filho is not None:
             self.adicionar_entidade(filho)
+            self.registrar_log(
+                f"Novo(a) {filho.nome} nasceu em {filho.posicao}"
+            )
             
     def predar(self  , entidade:Entidade):
         celula = self.mapa.obter_celula(entidade.posicao)
         presas = celula.entidades
         
         if isinstance(entidade, Animal):
-            entidade.alimentar(presas)
+            evento = entidade.alimentar(presas)
+            if evento is not None:
+                self.registrar_log(evento)
             
        
                     
@@ -120,6 +127,12 @@ class Mundo:
                 
         self.remover_mortos()
         
+    def registrar_log(self , mensagem:str):
+        dias = self.horas_passadas // 24 
+        horas = self.horas_passadas % 24
+        # print(mensagem)
+        self.logs.appendleft(f"[Dia {dias} - {horas}h] {mensagem}")
+        
     def __str__(self):
         return f"o mundo possui {len(self.entidades_mundo)} entidades"
     
@@ -127,5 +140,6 @@ class Mundo:
         return{
             "mapa" : self.mapa.to_dict() ,
             "total_entidades" : len(self.entidades_mundo),
-            "horas_passadas" : self.horas_passadas
+            "horas_passadas" : self.horas_passadas ,
+            "logs" : list(self.logs) ,
         }
